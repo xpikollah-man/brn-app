@@ -3,26 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xpikollah Trading Plan Strategy</title>
+    <title>Dola BRN + MA Assistant</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        body { background: #0f0f0f; color: white; font-family: 'Segoe UI', Arial; text-align: center; padding: 20px; }
-        .container { max-width: 400px; margin: auto; background: #1a1a1a; padding: 25px; border-radius: 15px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .input-group { text-align: left; margin-bottom: 15px; }
-        label { font-size: 0.85em; color: #f1c40f; margin-left: 5px; font-weight: bold; }
-        input { padding: 12px; margin: 5px 0 10px 0; border-radius: 8px; border: 1px solid #444; width: 100%; background: #222; color: white; box-sizing: border-box; font-size: 1em; }
-        button { padding: 15px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; font-size: 1.1em; }
-        button:hover { background: #0056b3; transform: translateY(-2px); }
-        .result-box { margin-top: 20px; padding: 15px; border-radius: 10px; text-align: left; background: #252525; border: 1px dashed #444; }
-        .buy-zone { border-left: 5px solid #2ecc71; margin-bottom: 15px; padding-left: 12px; }
-        .sell-zone { border-left: 5px solid #e74c3c; padding-left: 12px; }
-        .buy-text { color: #2ecc71; font-weight: bold; font-size: 1.1em; }
-        .sell-text { color: #e74c3c; font-weight: bold; font-size: 1.1em; }
-        h2 { color: #f1c40f; margin: 0; font-size: 1.5em; }
-        .subtitle { color: #888; font-size: 0.75em; margin-bottom: 20px; letter-spacing: 1px; }
-        .brn-highlight { color: #f1c40f; font-weight: bold; font-size: 1.1em; }
+        body { background: #0f0f0f; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 20px; }
+        .container { background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #333; display: inline-block; width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        select, input { padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #444; width: 100%; background: #222; color: white; box-sizing: border-box; }
+        label { display: block; text-align: left; font-size: 12px; color: #aaa; margin-top: 10px; }
+        button { padding: 15px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 15px; transition: 0.3s; }
+        button:hover { background: #0056b3; }
+        .result-box { margin-top: 20px; padding: 15px; border-radius: 10px; text-align: left; background: #252525; border-left: 5px solid #444; }
+        .buy-box { border-left-color: #27ae60; background: rgba(39, 174, 96, 0.1); }
+        .sell-box { border-left-color: #e74c3c; background: rgba(231, 76, 60, 0.1); }
+        .strong { font-weight: bold; text-transform: uppercase; font-size: 1.1em; }
+        .buy { color: #2ecc71; }
+        .sell { color: #e74c3c; }
+        .info-text { font-size: 11px; color: #888; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -31,89 +29,78 @@
         const { useState } = React;
 
         function App() {
-            const [high, setHigh] = useState("");
-            const [low, setLow] = useState("");
+            const [price, setPrice] = useState("");
+            const [maStatus, setMaStatus] = useState("up"); // ma50 > ma200
+            const [zigzag, setZigzag] = useState("up"); // zigzag crossing up
             const [result, setResult] = useState(null);
 
-            // Logik Quarter BRN (0, 25, 50, 75)
-            const getQuarterBRN = (price) => {
-                const p = parseFloat(price);
-                const base = Math.floor(p / 100) * 100; // Contoh: 4512 -> 4500
-                const levels = [base, base + 25, base + 50, base + 75, base + 100];
-                
-                let nearest = levels[0];
-                let minDiff = Math.abs(p - levels[0]);
-
-                levels.forEach(l => {
-                    const diff = Math.abs(p - l);
-                    if (diff < minDiff) {
-                        minDiff = diff;
-                        nearest = l;
-                    }
-                });
-                return nearest.toFixed(2);
-            };
-
             const analyze = () => {
-                const H = parseFloat(high);
-                const L = parseFloat(low);
+                const p = parseFloat(price);
+                if (isNaN(p)) return alert("Sila masukkan harga!");
 
-                if (isNaN(H) || isNaN(L)) return alert("Sila masukkan harga High dan Low!");
-                if (L >= H) return alert("Harga High mestilah lebih tinggi daripada Low!");
+                // Logic BRN
+                const nearestBR = Math.round(p / 25) * 25;
+                
+                let signal = "";
+                let detail = "";
+                let styleClass = "";
+                let boxClass = "";
 
-                const range = H - L;
+                // TRIPLE CONFIRMATION LOGIC
+                // 1. Check MA (Trend)
+                // 2. Check Zigzag (Structure/Momentum)
+                
+                if (maStatus === "up" && zigzag === "up" && p > nearestBR) {
+                    signal = "STRONG BUY CONFIRMED";
+                    detail = "MA 50 > 200 + Zigzag Cross Up + Above Structure A";
+                    styleClass = "buy strong";
+                    boxClass = "buy-box";
+                } else if (maStatus === "down" && zigzag === "down" && p < nearestBR) {
+                    signal = "STRONG SELL CONFIRMED";
+                    detail = "MA 50 < 200 + Zigzag Cross Down + Below Structure A";
+                    styleClass = "sell strong";
+                    boxClass = "sell-box";
+                } else {
+                    signal = "NEUTRAL / WAITING";
+                    detail = "Momentum MA dan Zigzag tidak selari. Sila tunggu Triple Cross.";
+                    styleClass = "";
+                    boxClass = "";
+                }
 
-                // Deep Crab 161.8% Calculation
-                const sellD = H + (range * 0.618);
-                const buyD = L - (range * 0.618);
-
-                setResult({
-                    sellD: sellD.toFixed(2),
-                    sellBRN: getQuarterBRN(sellD),
-                    sellSL: (sellD * 1.002).toFixed(2), // SL buffer 0.2%
-                    buyD: buyD.toFixed(2),
-                    buyBRN: getQuarterBRN(buyD),
-                    buySL: (buyD * 0.998).toFixed(2)  // SL buffer 0.2%
-                });
+                setResult({ nearestBR, signal, detail, styleClass, boxClass });
             };
 
             return (
                 <div className="container">
-                    <h2>Fikrullah Inra</h2>
-                    <div className="subtitle">FRACTAL BRN & HARMONIC 161.8%</div>
+                    <h2 style={{color: "#f1c40f", marginBottom: "5px"}}>DOLA TRADING</h2>
+                    <p style={{fontSize: "12px", color: "#888", marginBottom: "20px"}}>BRN + MA 50/200 + ZIGZAG</p>
                     
-                    <div className="input-group">
-                        <label>Highest Price (Wave High)</label>
-                        <input type="number" placeholder="Cth: 4512.15" value={high} onChange={(e)=>setHigh(e.target.value)} />
-                        
-                        <label>Lowest Price (Wave Low)</label>
-                        <input type="number" placeholder="Cth: 4490.00" value={low} onChange={(e)=>setLow(e.target.value)} />
-                    </div>
-                    
+                    <label>HARGA SEMASA (GOLD)</label>
+                    <input type="number" placeholder="Cth: 4424.50" value={price} onChange={(e)=>setPrice(e.target.value)} />
+
+                    <label>STATUS MA 50 & 200</label>
+                    <select value={maStatus} onChange={(e)=>setMaStatus(e.target.value)}>
+                        <option value="up">MA 50 di ATAS MA 200 (Bullish)</option>
+                        <option value="down">MA 50 di BAWAH MA 200 (Bearish)</option>
+                    </select>
+
+                    <label>ZIGZAG CROSSING (M1)</label>
+                    <select value={zigzag} onChange={(e)=>setZigzag(e.target.value)}>
+                        <option value="up">Zigzag Cross Up (Lelapasi MA50)</option>
+                        <option value="down">Zigzag Cross Down (Bawah MA50)</option>
+                    </select>
+
                     <button onClick={analyze}>ANALYZE MARKET</button>
 
                     {result && (
-                        <div className="result-box">
-                            <div className="sell-zone">
-                                <span className="sell-text">BEARISH ZN (SELL)</span>
-                                <p style={{margin: "8px 0 2px 0"}}>Entry D: <b>{result.sellD}</b></p>
-                                <p style={{margin: "2px 0"}}>Zon BRN: <span className="brn-highlight">{result.sellBRN}</span></p>
-                                <p style={{margin: "2px 0", fontSize: "0.85em", color: "#aaa"}}>SL: {result.sellSL}</p>
-                            </div>
-                            
-                            <hr style={{borderColor: "#333", margin: "15px 0"}} />
-
-                            <div className="buy-zone">
-                                <span className="buy-text">BULLISH ZN (BUY)</span>
-                                <p style={{margin: "8px 0 2px 0"}}>Entry D: <b>{result.buyD}</b></p>
-                                <p style={{margin: "2px 0"}}>Zon BRN: <span className="brn-highlight">{result.buyBRN}</span></p>
-                                <p style={{margin: "2px 0", fontSize: "0.85em", color: "#aaa"}}>SL: {result.buySL}</p>
-                            </div>
-                            <small style={{display:"block", marginTop: "10px", color: "#666", fontSize: "0.7em"}}>
-                                *Fokus entry apabila Entry D berdekatan Zon BRN.
-                            </small>
+                        <div className={`result-box ${result.boxClass}`}>
+                            <p style={{fontSize: "12px", margin: "0"}}>Nearest Zone: <b>{result.nearestBR}</b></p>
+                            <p style={{margin: "10px 0"}}>Signal: <span className={result.styleClass}>{result.signal}</span></p>
+                            <p style={{fontSize: "11px", lineHeight: "1.4"}}>{result.detail}</p>
                         </div>
                     )}
+                    
+                    <p className="info-text">*Entry paling padu apabila ZigZag cross kedua-dua MA serentak.</p>
                 </div>
             );
         }

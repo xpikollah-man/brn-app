@@ -3,24 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BRN & Harmonic Assistant</title>
+    <title>Xpikollah X dolla Tolls</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
         body { background: #0f0f0f; color: white; font-family: 'Segoe UI', Arial; text-align: center; padding: 20px; }
-        .container { max-width: 400px; margin: auto; background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #333; }
-        .input-group { text-align: left; margin-bottom: 10px; }
-        label { font-size: 0.8em; color: #aaa; margin-left: 5px; }
-        select, input { padding: 12px; margin: 5px 0 15px 0; border-radius: 8px; border: 1px solid #444; width: 100%; background: #222; color: white; box-sizing: border-box; }
-        button { padding: 14px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; }
-        button:hover { background: #0056b3; }
+        .container { max-width: 400px; margin: auto; background: #1a1a1a; padding: 25px; border-radius: 15px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .input-group { text-align: left; margin-bottom: 15px; }
+        label { font-size: 0.85em; color: #f1c40f; margin-left: 5px; font-weight: bold; }
+        input { padding: 12px; margin: 5px 0 10px 0; border-radius: 8px; border: 1px solid #444; width: 100%; background: #222; color: white; box-sizing: border-box; font-size: 1em; }
+        button { padding: 15px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; font-size: 1.1em; }
+        button:hover { background: #0056b3; transform: translateY(-2px); }
         .result-box { margin-top: 20px; padding: 15px; border-radius: 10px; text-align: left; background: #252525; border: 1px dashed #444; }
-        .buy-zone { border-left: 5px solid #2ecc71; margin-bottom: 15px; padding-left: 10px; }
-        .sell-zone { border-left: 5px solid #e74c3c; padding-left: 10px; }
-        .buy-text { color: #2ecc71; font-weight: bold; }
-        .sell-text { color: #e74c3c; font-weight: bold; }
-        h2 { color: #f1c40f; margin-bottom: 5px; }
+        .buy-zone { border-left: 5px solid #2ecc71; margin-bottom: 15px; padding-left: 12px; }
+        .sell-zone { border-left: 5px solid #e74c3c; padding-left: 12px; }
+        .buy-text { color: #2ecc71; font-weight: bold; font-size: 1.1em; }
+        .sell-text { color: #e74c3c; font-weight: bold; font-size: 1.1em; }
+        h2 { color: #f1c40f; margin: 0; font-size: 1.5em; }
+        .subtitle { color: #888; font-size: 0.75em; margin-bottom: 20px; letter-spacing: 1px; }
+        .brn-highlight { color: #f1c40f; font-weight: bold; font-size: 1.1em; }
     </style>
 </head>
 <body>
@@ -33,7 +35,26 @@
             const [low, setLow] = useState("");
             const [result, setResult] = useState(null);
 
-            const calculateHarmonic = () => {
+            // Logik Quarter BRN (0, 25, 50, 75)
+            const getQuarterBRN = (price) => {
+                const p = parseFloat(price);
+                const base = Math.floor(p / 100) * 100; // Contoh: 4512 -> 4500
+                const levels = [base, base + 25, base + 50, base + 75, base + 100];
+                
+                let nearest = levels[0];
+                let minDiff = Math.abs(p - levels[0]);
+
+                levels.forEach(l => {
+                    const diff = Math.abs(p - l);
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        nearest = l;
+                    }
+                });
+                return nearest.toFixed(2);
+            };
+
+            const analyze = () => {
                 const H = parseFloat(high);
                 const L = parseFloat(low);
 
@@ -42,63 +63,55 @@
 
                 const range = H - L;
 
-                // Pengiraan Deep Crab (161.8%)
-                // 1. Bullish (Cari Buy di bawah) -> Extension dari High ke Low
-                const buyD = L - (range * 0.618); // L - (H-L)*0.618 bersamaan extension 161.8% dari XA
-                const buySL = L - (range * 0.90);
-                
-                // 2. Bearish (Cari Sell di atas) -> Extension dari Low ke High
+                // Deep Crab 161.8% Calculation
                 const sellD = H + (range * 0.618);
-                const sellSL = H + (range * 0.90);
-
-                // BRN terdekat untuk kedua-dua zone
-                const getBRN = (price) => {
-                    const base = Math.floor(price / 10) * 10;
-                    return (price - base >= 5) ? base + 10 : base;
-                };
+                const buyD = L - (range * 0.618);
 
                 setResult({
-                    buyD: buyD.toFixed(2),
-                    buySL: buySL.toFixed(2),
-                    buyBRN: getBRN(buyD).toFixed(2),
                     sellD: sellD.toFixed(2),
-                    sellSL: sellSL.toFixed(2),
-                    sellBRN: getBRN(sellD).toFixed(2),
+                    sellBRN: getQuarterBRN(sellD),
+                    sellSL: (sellD * 1.002).toFixed(2), // SL buffer 0.2%
+                    buyD: buyD.toFixed(2),
+                    buyBRN: getQuarterBRN(buyD),
+                    buySL: (buyD * 0.998).toFixed(2)  // SL buffer 0.2%
                 });
             };
 
             return (
                 <div className="container">
-                    <h2>TRADING ASSISTANT</h2>
-                    <p style={{fontSize: "0.8em", color: "#888"}}>Input High & Low Wave untuk 161.8%</p>
+                    <h2>Xpikollah X dolla Tolls</h2>
+                    <div className="subtitle">FRACTAL BRN & HARMONIC 161.8%</div>
                     
                     <div className="input-group">
-                        <label>Highest Price (H)</label>
-                        <input type="number" placeholder="Cth: 2350.00" value={high} onChange={(e)=>setHigh(e.target.value)} />
+                        <label>Highest Price (Wave High)</label>
+                        <input type="number" placeholder="Cth: 4512.15" value={high} onChange={(e)=>setHigh(e.target.value)} />
                         
-                        <label>Lowest Price (L)</label>
-                        <input type="number" placeholder="Cth: 2300.00" value={low} onChange={(e)=>setLow(e.target.value)} />
+                        <label>Lowest Price (Wave Low)</label>
+                        <input type="number" placeholder="Cth: 4490.00" value={low} onChange={(e)=>setLow(e.target.value)} />
                     </div>
                     
-                    <button onClick={calculateHarmonic}>ANALYZE MARKET</button>
+                    <button onClick={analyze}>ANALYZE MARKET</button>
 
                     {result && (
                         <div className="result-box">
                             <div className="sell-zone">
                                 <span className="sell-text">BEARISH ZN (SELL)</span>
-                                <p style={{margin: "5px 0"}}>Entry D: <b>{result.sellD}</b></p>
-                                <p style={{margin: "5px 0", fontSize: "0.85em"}}>BRN: <span style={{color: "#f1c40f"}}>{result.sellBRN}</span></p>
-                                <p style={{margin: "5px 0", fontSize: "0.85em"}}>SL: {result.sellSL}</p>
+                                <p style={{margin: "8px 0 2px 0"}}>Entry D: <b>{result.sellD}</b></p>
+                                <p style={{margin: "2px 0"}}>Zon BRN: <span className="brn-highlight">{result.sellBRN}</span></p>
+                                <p style={{margin: "2px 0", fontSize: "0.85em", color: "#aaa"}}>SL: {result.sellSL}</p>
                             </div>
                             
                             <hr style={{borderColor: "#333", margin: "15px 0"}} />
 
                             <div className="buy-zone">
                                 <span className="buy-text">BULLISH ZN (BUY)</span>
-                                <p style={{margin: "5px 0"}}>Entry D: <b>{result.buyD}</b></p>
-                                <p style={{margin: "5px 0", fontSize: "0.85em"}}>BRN: <span style={{color: "#f1c40f"}}>{result.buyBRN}</span></p>
-                                <p style={{margin: "5px 0", fontSize: "0.85em"}}>SL: {result.buySL}</p>
+                                <p style={{margin: "8px 0 2px 0"}}>Entry D: <b>{result.buyD}</b></p>
+                                <p style={{margin: "2px 0"}}>Zon BRN: <span className="brn-highlight">{result.buyBRN}</span></p>
+                                <p style={{margin: "2px 0", fontSize: "0.85em", color: "#aaa"}}>SL: {result.buySL}</p>
                             </div>
+                            <small style={{display:"block", marginTop: "10px", color: "#666", fontSize: "0.7em"}}>
+                                *Fokus entry apabila Entry D berdekatan Zon BRN.
+                            </small>
                         </div>
                     )}
                 </div>

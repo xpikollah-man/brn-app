@@ -3,24 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dola BRN + MA Assistant</title>
+    <title>Beta project: Triple Confirmation & Strength</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        body { background: #0f0f0f; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 20px; }
-        .container { background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #333; display: inline-block; width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        select, input { padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #444; width: 100%; background: #222; color: white; box-sizing: border-box; }
-        label { display: block; text-align: left; font-size: 12px; color: #aaa; margin-top: 10px; }
-        button { padding: 15px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 15px; transition: 0.3s; }
-        button:hover { background: #0056b3; }
-        .result-box { margin-top: 20px; padding: 15px; border-radius: 10px; text-align: left; background: #252525; border-left: 5px solid #444; }
-        .buy-box { border-left-color: #27ae60; background: rgba(39, 174, 96, 0.1); }
-        .sell-box { border-left-color: #e74c3c; background: rgba(231, 76, 60, 0.1); }
-        .strong { font-weight: bold; text-transform: uppercase; font-size: 1.1em; }
-        .buy { color: #2ecc71; }
-        .sell { color: #e74c3c; }
-        .info-text { font-size: 11px; color: #888; margin-top: 10px; }
+        body { background: #080808; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; padding: 20px; }
+        .app-card { background: #121212; border: 1px solid #222; border-radius: 24px; width: 100%; max-width: 420px; padding: 30px; box-shadow: 0 30px 60px rgba(0,0,0,0.9); }
+        h2 { color: #f1c40f; font-size: 20px; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 3px; text-align: center; }
+        .subtitle { font-size: 9px; color: #555; text-align: center; margin-bottom: 25px; letter-spacing: 1px; }
+        
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-size: 10px; color: #777; margin-bottom: 5px; text-transform: uppercase; font-weight: bold; }
+        input, select { width: 100%; padding: 14px; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; color: white; font-size: 14px; box-sizing: border-box; transition: 0.3s; }
+        input:focus { border-color: #f1c40f; outline: none; }
+
+        .strength-container { margin: 20px 0; text-align: center; }
+        .progress-bg { background: #222; height: 12px; border-radius: 6px; overflow: hidden; margin-top: 10px; border: 1px solid #333; }
+        .progress-bar { height: 100%; transition: width 0.8s ease-in-out; }
+
+        button { width: 100%; padding: 16px; background: #f1c40f; color: #000; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        button:hover { background: #d4ac0d; transform: scale(1.02); }
+
+        .result-panel { margin-top: 25px; background: #181818; border-radius: 16px; padding: 20px; border: 1px solid #222; }
+        .data-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        .data-label { font-size: 11px; color: #666; }
+        .data-value { font-size: 13px; font-family: 'Monaco', monospace; font-weight: bold; }
+        
+        .buy-theme { color: #00ff88; }
+        .sell-theme { color: #ff4444; }
+        .neutral-theme { color: #888; }
     </style>
 </head>
 <body>
@@ -30,77 +42,121 @@
 
         function App() {
             const [price, setPrice] = useState("");
-            const [maStatus, setMaStatus] = useState("up"); // ma50 > ma200
-            const [zigzag, setZigzag] = useState("up"); // zigzag crossing up
+            const [maTrend, setMaTrend] = useState("up"); // 50 vs 200
+            const [priceVsMa, setPriceVsMa] = useState("above"); // Price vs 50
+            const [zigzag, setZigzag] = useState("up");
             const [result, setResult] = useState(null);
 
             const analyze = () => {
                 const p = parseFloat(price);
                 if (isNaN(p)) return alert("Sila masukkan harga!");
 
-                // Logic BRN
-                const nearestBR = Math.round(p / 25) * 25;
-                
-                let signal = "";
-                let detail = "";
-                let styleClass = "";
-                let boxClass = "";
+                let strength = 0;
+                let direction = "";
 
-                // TRIPLE CONFIRMATION LOGIC
-                // 1. Check MA (Trend)
-                // 2. Check Zigzag (Structure/Momentum)
-                
-                if (maStatus === "up" && zigzag === "up" && p > nearestBR) {
-                    signal = "STRONG BUY CONFIRMED";
-                    detail = "MA 50 > 200 + Zigzag Cross Up + Above Structure A";
-                    styleClass = "buy strong";
-                    boxClass = "buy-box";
-                } else if (maStatus === "down" && zigzag === "down" && p < nearestBR) {
-                    signal = "STRONG SELL CONFIRMED";
-                    detail = "MA 50 < 200 + Zigzag Cross Down + Below Structure A";
-                    styleClass = "sell strong";
-                    boxClass = "sell-box";
+                // LOGIK PENGIRAAN STRENGTH (%)
+                // Kita guna MA Trend sebagai penentu arah dasar
+                if (maTrend === "up") {
+                    direction = "BUY";
+                    strength += 25; // Syarat 1: MA 50 > 200
+                    if (priceVsMa === "above") strength += 25; // Syarat 2: Harga > MA 50
+                    if (zigzag === "up") strength += 50; // Syarat 3: Zigzag Momentum (Pemberat lebih)
                 } else {
-                    signal = "NEUTRAL / WAITING";
-                    detail = "Momentum MA dan Zigzag tidak selari. Sila tunggu Triple Cross.";
-                    styleClass = "";
-                    boxClass = "";
+                    direction = "SELL";
+                    strength += 25; // Syarat 1: MA 50 < 200
+                    if (priceVsMa === "below") strength += 25; // Syarat 2: Harga < MA 50
+                    if (zigzag === "down") strength += 50; // Syarat 3: Zigzag Momentum
                 }
 
-                setResult({ nearestBR, signal, detail, styleClass, boxClass });
+                // Pengiraan TP/SL (Harmonic 161.8 Style)
+                const risk = 10.00;
+                const sl = direction === "BUY" ? (p - risk) : (p + risk);
+                const tp2 = direction === "BUY" ? (p + (risk * 2)) : (p - (risk * 2));
+
+                setResult({
+                    direction,
+                    strength,
+                    entry: p.toFixed(2),
+                    sl: sl.toFixed(2),
+                    tp: tp2.toFixed(2),
+                    theme: direction === "BUY" ? "buy-theme" : "sell-theme",
+                    barColor: direction === "BUY" ? "#00ff88" : "#ff4444"
+                });
             };
 
             return (
-                <div className="container">
-                    <h2 style={{color: "#f1c40f", marginBottom: "5px"}}>DOLA TRADING</h2>
-                    <p style={{fontSize: "12px", color: "#888", marginBottom: "20px"}}>BRN + MA 50/200 + ZIGZAG</p>
+                <div className="app-card">
+                    <h2>DOLA ANALYTICS</h2>
+                    <div className="subtitle">M1 SCALPING SYSTEM • V2.0</div>
                     
-                    <label>HARGA SEMASA (GOLD)</label>
-                    <input type="number" placeholder="Cth: 4424.50" value={price} onChange={(e)=>setPrice(e.target.value)} />
+                    <div className="input-group">
+                        <label>Current Gold Price</label>
+                        <input type="number" value={price} onChange={(e)=>setPrice(e.target.value)} placeholder="4424.50" />
+                    </div>
 
-                    <label>STATUS MA 50 & 200</label>
-                    <select value={maStatus} onChange={(e)=>setMaStatus(e.target.value)}>
-                        <option value="up">MA 50 di ATAS MA 200 (Bullish)</option>
-                        <option value="down">MA 50 di BAWAH MA 200 (Bearish)</option>
-                    </select>
+                    <div className="input-group">
+                        <label>MA 50 vs MA 200 (Trend)</label>
+                        <select value={maTrend} onChange={(e)=>setMaTrend(e.target.value)}>
+                            <option value="up">MA 50 > MA 200 (Bullish)</option>
+                            <option value="down">MA 50 < MA 200 (Bearish)</option>
+                        </select>
+                    </div>
 
-                    <label>ZIGZAG CROSSING (M1)</label>
-                    <select value={zigzag} onChange={(e)=>setZigzag(e.target.value)}>
-                        <option value="up">Zigzag Cross Up (Lelapasi MA50)</option>
-                        <option value="down">Zigzag Cross Down (Bawah MA50)</option>
-                    </select>
+                    <div className="input-group">
+                        <label>Price Position vs MA 50</label>
+                        <select value={priceVsMa} onChange={(e)=>setPriceVsMa(e.target.value)}>
+                            <option value="above">Above MA 50</option>
+                            <option value="below">Below MA 50</option>
+                        </select>
+                    </div>
 
-                    <button onClick={analyze}>ANALYZE MARKET</button>
+                    <div className="input-group">
+                        <label>ZigZag Crossing (Momentum)</label>
+                        <select value={zigzag} onChange={(e)=>setZigzag(e.target.value)}>
+                            <option value="up">Crossing UP (Strong)</option>
+                            <option value="down">Crossing DOWN (Strong)</option>
+                        </select>
+                    </div>
+
+                    <button onClick={analyze}>RUN ANALYSIS</button>
 
                     {result && (
-                        <div className={`result-box ${result.boxClass}`}>
-                            <p style={{fontSize: "12px", margin: "0"}}>Nearest Zone: <b>{result.nearestBR}</b></p>
-                            <p style={{margin: "10px 0"}}>Signal: <span className={result.styleClass}>{result.signal}</span></p>
-                            <p style={{fontSize: "11px", lineHeight: "1.4"}}>{result.detail}</p>
+                        <div className="result-panel">
+                            <div className="strength-container">
+                                <div style={{fontSize: '12px', fontWeight: 'bold', color: '#fff'}}>
+                                    SIGNAL STRENGTH: <span className={result.theme}>{result.strength}%</span>
+                                </div>
+                                <div className="progress-bg">
+                                    <div className="progress-bar" style={{ 
+                                        width: `${result.strength}%`, 
+                                        backgroundColor: result.barColor,
+                                        boxShadow: `0 0 10px ${result.barColor}`
+                                    }}></div>
+                                </div>
+                            </div>
+
+                            <div className="data-row">
+                                <span className="data-label">DIRECTION</span>
+                                <span className={`data-value ${result.theme}`}>{result.direction}</span>
+                            </div>
+                            <div className="data-row">
+                                <span className="data-label">ENTRY</span>
+                                <span className="data-value">{result.entry}</span>
+                            </div>
+                            <div className="data-row">
+                                <span className="data-label">STOP LOSS</span>
+                                <span className="data-value" style={{color: '#ff4444'}}>{result.sl}</span>
+                            </div>
+                            <div className="data-row">
+                                <span className="data-label">TARGET PROFIT (1:2)</span>
+                                <span className="data-value" style={{color: '#00ff88'}}>{result.tp}</span>
+                            </div>
+
+                            <p style={{fontSize: '9px', color: '#444', marginTop: '15px', textAlign: 'center'}}>
+                                CONFIRMATION: {result.strength >= 75 ? "READY TO ENTRY" : "WAITING FOR MOMENTUM"}
+                            </p>
                         </div>
                     )}
-                    
-                    <p className="info-text">*Entry paling padu apabila ZigZag cross kedua-dua MA serentak.</p>
                 </div>
             );
         }

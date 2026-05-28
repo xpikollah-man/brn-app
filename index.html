@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BRN Trading Assistant</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body { background: #0f0f0f; color: white; font-family: Arial; text-align: center; padding: 20px; }
+        select, input { padding: 10px; margin: 10px; border-radius: 5px; border: none; width: 80%; max-width: 300px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .result-box { margin-top: 20px; padding: 15px; border: 1px solid #333; border-radius: 10px; display: inline-block; text-align: left; background: #1a1a1a; }
+        .level { color: #8e44ad; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        function App() {
+            const [price, setPrice] = useState("");
+            const [timeframe, setTimeframe] = useState("H1");
+            const [result, setResult] = useState(null);
+
+            const getThreshold = (tf) => {
+                const thresholds = { "M1": 2, "H1": 5, "H4": 10, "H8": 15 };
+                return thresholds[tf] || 5;
+            };
+
+            const analyze = () => {
+                const p = parseFloat(price);
+                if (isNaN(p)) return alert("Masukkan harga!");
+
+                const base = Math.floor(p / 100) * 100;
+                const levels = [base, base + 25, base + 50, base + 75, base + 100];
+                
+                let nearest = levels[0];
+                let d = Math.abs(p - levels[0]);
+                levels.forEach(lvl => {
+                    if (Math.abs(p - lvl) < d) {
+                        d = Math.abs(p - lvl);
+                        nearest = lvl;
+                    }
+                });
+
+                const diff = p - nearest;
+                const threshold = getThreshold(timeframe);
+                let signal = "NO TRADE";
+
+                if (Math.abs(diff) <= threshold) {
+                    signal = "DEKAT BRN - Tunggu Confirmation Candle";
+                } else if (diff > 0) {
+                    signal = "SELL Bias - Cari Rejection";
+                } else {
+                    signal = "BUY Bias - Cari Rejection";
+                }
+
+                setResult({ timeframe, price: p, base, nearest, signal, levels });
+            };
+
+            return (
+                <div>
+                    <h2>BRN Trading Assistant</h2>
+                    <select value={timeframe} onChange={(e) => setTimeframe(e.target.value)}>
+                        <option value="M1">M1 (Threshold 2)</option>
+                        <option value="H1">H1 (Threshold 5)</option>
+                        <option value="H4">H4 (Threshold 10)</option>
+                        <option value="H8">H8 (Threshold 15)</option>
+                    </select>
+                    <br/>
+                    <input 
+                        type="number" 
+                        placeholder="Harga Gold (cth: 4373)" 
+                        value={price} 
+                        onChange={(e) => setPrice(e.target.value)} 
+                    />
+                    <br/>
+                    <button onClick={analyze}>ANALYZE MARKET</button>
+
+                    {result && (
+                        <div className="result-box">
+                            <p><b>Signal:</b> {result.signal}</p>
+                            <p><b>Nearest Level:</b> {result.nearest}</p>
+                            <p><b>Levels:</b> {result.levels.join(" | ")}</p>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

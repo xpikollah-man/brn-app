@@ -3,89 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BRN Trading Assistant</title>
+    <title>BRN & Harmonic Assistant</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        body { background: #0f0f0f; color: white; font-family: Arial; text-align: center; padding: 20px; }
-        select, input { padding: 10px; margin: 10px; border-radius: 5px; border: none; width: 80%; max-width: 300px; }
-        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .result-box { margin-top: 20px; padding: 15px; border: 1px solid #333; border-radius: 10px; display: inline-block; text-align: left; background: #1a1a1a; }
-        .level { color: #8e44ad; font-weight: bold; }
+        body { background: #0f0f0f; color: white; font-family: 'Segoe UI', Arial; text-align: center; padding: 20px; }
+        .container { max-width: 400px; margin: auto; background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #333; }
+        select, input { padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; width: 100%; background: #222; color: white; box-sizing: border-box; }
+        button { padding: 14px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; transition: 0.3s; }
+        button:hover { background: #0056b3; }
+        .result-box { margin-top: 20px; padding: 15px; border-left: 5px solid #007bff; text-align: left; background: #252525; border-radius: 5px; }
+        .buy { color: #2ecc71; font-weight: bold; }
+        .sell { color: #e74c3c; font-weight: bold; }
+        .info { color: #f1c40f; font-size: 0.9em; margin-bottom: 5px; }
+        h2 { margin-bottom: 5px; }
     </style>
 </head>
 <body>
     <div id="root"></div>
-
     <script type="text/babel">
         const { useState } = React;
 
         function App() {
-            const [price, setPrice] = useState("");
+            const [priceA, setPriceA] = useState(""); // Titik A (High/Low)
+            const [priceX, setPriceX] = useState(""); // Titik X (Asal)
             const [timeframe, setTimeframe] = useState("H1");
             const [result, setResult] = useState(null);
 
-            const getThreshold = (tf) => {
-                const thresholds = { "M1": 2, "H1": 5, "H4": 10, "H8": 15 };
-                return thresholds[tf] || 5;
-            };
-
             const analyze = () => {
-                const p = parseFloat(price);
-                if (isNaN(p)) return alert("Masukkan harga!");
+                const A = parseFloat(priceA);
+                const X = parseFloat(priceX);
 
-                const base = Math.floor(p / 100) * 100;
-                const levels = [base, base + 25, base + 50, base + 75, base + 100];
+                if (isNaN(A) || isNaN(X)) return alert("Sila masukkan harga X dan A!");
+
+                // 1. Logik Harmonic (Crab Pattern 161.8%)
+                const diffXA = Math.abs(A - X);
+                const isBullish = A > X; // Jika A lebih tinggi dari X, kita cari Deep Crab Sell di atas
                 
-                let nearest = levels[0];
-                let d = Math.abs(p - levels[0]);
-                levels.forEach(lvl => {
-                    if (Math.abs(p - lvl) < d) {
-                        d = Math.abs(p - lvl);
-                        nearest = lvl;
-                    }
+                // Titik D adalah 161.8% extension dari X ke A
+                const entryD = isBullish ? (X + (diffXA * 1.618)) : (X - (diffXA * 1.618));
+                
+                // Stop Loss (SL) biasanya di 190% atau 200%
+                const sl = isBullish ? (X + (diffXA * 1.90)) : (X - (diffXA * 1.90));
+                
+                // Take Profit (TP) target pertama di 61.8% retracement dari AD
+                const tp1 = isBullish ? (entryD - (Math.abs(entryD - A) * 0.618)) : (entryD + (Math.abs(entryD - A) * 0.618));
+
+                // 2. Logik BRN Terdekat untuk Titik D
+                const base = Math.floor(entryD / 10) * 10;
+                const brn = (entryD - base >= 5) ? base + 10 : base;
+
+                setResult({
+                    type: isBullish ? "BEARISH CRAB (Potential SELL)" : "BULLISH CRAB (Potential BUY)",
+                    entry: entryD.toFixed(2),
+                    sl: sl.toFixed(2),
+                    tp: tp1.toFixed(2),
+                    brn: brn.toFixed(2),
+                    styleClass: isBullish ? "sell" : "buy"
                 });
-
-                const diff = p - nearest;
-                const threshold = getThreshold(timeframe);
-                let signal = "NO TRADE";
-
-                if (Math.abs(diff) <= threshold) {
-                    signal = "DEKAT BRN - Tunggu Confirmation Candle";
-                } else if (diff > 0) {
-                    signal = "SELL Bias - Cari Rejection";
-                } else {
-                    signal = "BUY Bias - Cari Rejection";
-                }
-
-                setResult({ timeframe, price: p, base, nearest, signal, levels });
             };
 
             return (
-                <div>
-                    <h2>BRN Trading Assistant</h2>
-                    <select value={timeframe} onChange={(e) => setTimeframe(e.target.value)}>
-                        <option value="M1">M1 (Threshold 2)</option>
-                        <option value="H1">H1 (Threshold 5)</option>
-                        <option value="H4">H4 (Threshold 10)</option>
-                        <option value="H8">H8 (Threshold 15)</option>
+                <div className="container">
+                    <h2 style={{color: "#f1c40f"}}>Dola Trading Bot</h2>
+                    <p style={{fontSize: "0.8em", color: "#888"}}>Analisis Fibonacci 161.8% + BRN</p>
+                    
+                    <select value={timeframe} onChange={(e)=>setTimeframe(e.target.value)}>
+                        <option value="H1">H1 (Intraday)</option>
+                        <option value="H4">H4 (Swing)</option>
                     </select>
-                    <br/>
-                    <input 
-                        type="number" 
-                        placeholder="Harga Gold (cth: 4373)" 
-                        value={price} 
-                        onChange={(e) => setPrice(e.target.value)} 
-                    />
-                    <br/>
-                    <button onClick={analyze}>ANALYZE MARKET</button>
+
+                    <input type="number" placeholder="Harga Titik X (Start Leg)" value={priceX} onChange={(e)=>setPriceX(e.target.value)} />
+                    <input type="number" placeholder="Harga Titik A (Puncak Leg)" value={priceA} onChange={(e)=>setPriceA(e.target.value)} />
+                    
+                    <button onClick={analyze}>CALCULATE ENTRY D</button>
 
                     {result && (
                         <div className="result-box">
-                            <p><b>Signal:</b> {result.signal}</p>
-                            <p><b>Nearest Level:</b> {result.nearest}</p>
-                            <p><b>Levels:</b> {result.levels.join(" | ")}</p>
+                            <div className="info">Pattern: <span className={result.styleClass}>{result.type}</span></div>
+                            <hr style={{borderColor: "#444"}} />
+                            <p>Potential Entry (D): <b>{result.entry}</b></p>
+                            <p>Nearest BRN: <b style={{color: "#f1c40f"}}>{result.brn}</b></p>
+                            <p>Stop Loss (SL): <b className="sell">{result.sl}</b></p>
+                            <p>Take Profit (TP): <b className="buy">{result.tp}</b></p>
+                            <small style={{color: "#888"}}>*Entry terbaik jika D berdekatan dengan BRN.</small>
                         </div>
                     )}
                 </div>

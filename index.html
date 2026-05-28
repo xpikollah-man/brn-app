@@ -10,14 +10,17 @@
     <style>
         body { background: #0f0f0f; color: white; font-family: 'Segoe UI', Arial; text-align: center; padding: 20px; }
         .container { max-width: 400px; margin: auto; background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #333; }
-        select, input { padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; width: 100%; background: #222; color: white; box-sizing: border-box; }
-        button { padding: 14px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; transition: 0.3s; }
+        .input-group { text-align: left; margin-bottom: 10px; }
+        label { font-size: 0.8em; color: #aaa; margin-left: 5px; }
+        select, input { padding: 12px; margin: 5px 0 15px 0; border-radius: 8px; border: 1px solid #444; width: 100%; background: #222; color: white; box-sizing: border-box; }
+        button { padding: 14px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; }
         button:hover { background: #0056b3; }
-        .result-box { margin-top: 20px; padding: 15px; border-left: 5px solid #007bff; text-align: left; background: #252525; border-radius: 5px; }
-        .buy { color: #2ecc71; font-weight: bold; }
-        .sell { color: #e74c3c; font-weight: bold; }
-        .info { color: #f1c40f; font-size: 0.9em; margin-bottom: 5px; }
-        h2 { margin-bottom: 5px; }
+        .result-box { margin-top: 20px; padding: 15px; border-radius: 10px; text-align: left; background: #252525; border: 1px dashed #444; }
+        .buy-zone { border-left: 5px solid #2ecc71; margin-bottom: 15px; padding-left: 10px; }
+        .sell-zone { border-left: 5px solid #e74c3c; padding-left: 10px; }
+        .buy-text { color: #2ecc71; font-weight: bold; }
+        .sell-text { color: #e74c3c; font-weight: bold; }
+        h2 { color: #f1c40f; margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -26,68 +29,76 @@
         const { useState } = React;
 
         function App() {
-            const [priceA, setPriceA] = useState(""); // Titik A (High/Low)
-            const [priceX, setPriceX] = useState(""); // Titik X (Asal)
-            const [timeframe, setTimeframe] = useState("H1");
+            const [high, setHigh] = useState("");
+            const [low, setLow] = useState("");
             const [result, setResult] = useState(null);
 
-            const analyze = () => {
-                const A = parseFloat(priceA);
-                const X = parseFloat(priceX);
+            const calculateHarmonic = () => {
+                const H = parseFloat(high);
+                const L = parseFloat(low);
 
-                if (isNaN(A) || isNaN(X)) return alert("Sila masukkan harga X dan A!");
+                if (isNaN(H) || isNaN(L)) return alert("Sila masukkan harga High dan Low!");
+                if (L >= H) return alert("Harga High mestilah lebih tinggi daripada Low!");
 
-                // 1. Logik Harmonic (Crab Pattern 161.8%)
-                const diffXA = Math.abs(A - X);
-                const isBullish = A > X; // Jika A lebih tinggi dari X, kita cari Deep Crab Sell di atas
-                
-                // Titik D adalah 161.8% extension dari X ke A
-                const entryD = isBullish ? (X + (diffXA * 1.618)) : (X - (diffXA * 1.618));
-                
-                // Stop Loss (SL) biasanya di 190% atau 200%
-                const sl = isBullish ? (X + (diffXA * 1.90)) : (X - (diffXA * 1.90));
-                
-                // Take Profit (TP) target pertama di 61.8% retracement dari AD
-                const tp1 = isBullish ? (entryD - (Math.abs(entryD - A) * 0.618)) : (entryD + (Math.abs(entryD - A) * 0.618));
+                const range = H - L;
 
-                // 2. Logik BRN Terdekat untuk Titik D
-                const base = Math.floor(entryD / 10) * 10;
-                const brn = (entryD - base >= 5) ? base + 10 : base;
+                // Pengiraan Deep Crab (161.8%)
+                // 1. Bullish (Cari Buy di bawah) -> Extension dari High ke Low
+                const buyD = L - (range * 0.618); // L - (H-L)*0.618 bersamaan extension 161.8% dari XA
+                const buySL = L - (range * 0.90);
+                
+                // 2. Bearish (Cari Sell di atas) -> Extension dari Low ke High
+                const sellD = H + (range * 0.618);
+                const sellSL = H + (range * 0.90);
+
+                // BRN terdekat untuk kedua-dua zone
+                const getBRN = (price) => {
+                    const base = Math.floor(price / 10) * 10;
+                    return (price - base >= 5) ? base + 10 : base;
+                };
 
                 setResult({
-                    type: isBullish ? "BEARISH CRAB (Potential SELL)" : "BULLISH CRAB (Potential BUY)",
-                    entry: entryD.toFixed(2),
-                    sl: sl.toFixed(2),
-                    tp: tp1.toFixed(2),
-                    brn: brn.toFixed(2),
-                    styleClass: isBullish ? "sell" : "buy"
+                    buyD: buyD.toFixed(2),
+                    buySL: buySL.toFixed(2),
+                    buyBRN: getBRN(buyD).toFixed(2),
+                    sellD: sellD.toFixed(2),
+                    sellSL: sellSL.toFixed(2),
+                    sellBRN: getBRN(sellD).toFixed(2),
                 });
             };
 
             return (
                 <div className="container">
-                    <h2 style={{color: "#f1c40f"}}>Xpikollah Trading Strategy</h2>
-                    <p style={{fontSize: "0.8em", color: "#888"}}>Analisis Fibonacci 161.8% + BRN</p>
+                    <h2>TRADING ASSISTANT</h2>
+                    <p style={{fontSize: "0.8em", color: "#888"}}>Input High & Low Wave untuk 161.8%</p>
                     
-                    <select value={timeframe} onChange={(e)=>setTimeframe(e.target.value)}>
-                        <option value="H1">H1 (Intraday)</option>
-                        <option value="H4">H4 (Swing)</option>
-                    </select>
-
-                    <input type="number" placeholder="Harga Titik X (Start Leg)" value={priceX} onChange={(e)=>setPriceX(e.target.value)} />
-                    <input type="number" placeholder="Harga Titik A (Puncak Leg)" value={priceA} onChange={(e)=>setPriceA(e.target.value)} />
+                    <div className="input-group">
+                        <label>Highest Price (H)</label>
+                        <input type="number" placeholder="Cth: 2350.00" value={high} onChange={(e)=>setHigh(e.target.value)} />
+                        
+                        <label>Lowest Price (L)</label>
+                        <input type="number" placeholder="Cth: 2300.00" value={low} onChange={(e)=>setLow(e.target.value)} />
+                    </div>
                     
-                    <button onClick={analyze}>CALCULATE ENTRY D</button>
+                    <button onClick={calculateHarmonic}>ANALYZE MARKET</button>
 
                     {result && (
                         <div className="result-box">
-                            <div className="info">Pattern: <span className={result.styleClass}>{result.type}</span></div>
-                            <hr style={{borderColor: "#444"}} />
-                            <p>Potential Entry (D): <b>{result.entry}</b></p>
-                            <p>Nearest BRN: <b style={{color: "#f1c40f"}}>{result.brn}</b></p>
-                            <p>Stop Loss (SL): <b className="sell">{result.sl}</b></p>
-                            <p>Take Profit (TP): <b className="buy">{result.tp}</b></p>
-                            <small style={{color: "#888"}}>*Entry terbaik jika D berdekatan dengan BRN.</small>
+                            <div className="sell-zone">
+                                <span className="sell-text">BEARISH ZN (SELL)</span>
+                                <p style={{margin: "5px 0"}}>Entry D: <b>{result.sellD}</b></p>
+                                <p style={{margin: "5px 0", fontSize: "0.85em"}}>BRN: <span style={{color: "#f1c40f"}}>{result.sellBRN}</span></p>
+                                <p style={{margin: "5px 0", fontSize: "0.85em"}}>SL: {result.sellSL}</p>
+                            </div>
+                            
+                            <hr style={{borderColor: "#333", margin: "15px 0"}} />
+
+                            <div className="buy-zone">
+                                <span className="buy-text">BULLISH ZN (BUY)</span>
+                                <p style={{margin: "5px 0"}}>Entry D: <b>{result.buyD}</b></p>
+                                <p style={{margin: "5px 0", fontSize: "0.85em"}}>BRN: <span style={{color: "#f1c40f"}}>{result.buyBRN}</span></p>
+                                <p style={{margin: "5px 0", fontSize: "0.85em"}}>SL: {result.buySL}</p>
+                            </div>
                         </div>
                     )}
                 </div>

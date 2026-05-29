@@ -35,10 +35,16 @@
             display: flex; flex-direction: column; align-items: center;
         }
         .glass-tube {
-            width: 10px; height: 50px; background: #222; border-radius: 10px;
-            position: relative; overflow: hidden; margin-bottom: 8px;
+            width: 14px; height: 60px; background: #222; border-radius: 10px;
+            position: relative; overflow: hidden; margin-bottom: 8px; border: 1px solid #333;
+            /* Penanda 4 Garis (Setiap 2.25 jam / 25%) */
+            background-image: linear-gradient(to bottom, 
+                transparent 24%, rgba(255,255,255,0.2) 24%, rgba(255,255,255,0.2) 26%, 
+                transparent 26%, transparent 49%, rgba(255,255,255,0.5) 49%, rgba(255,255,255,0.5) 51%, 
+                transparent 51%, transparent 74%, rgba(255,255,255,0.2) 74%, rgba(255,255,255,0.2) 76%, 
+                transparent 76%);
         }
-        .sand-fill { position: absolute; bottom: 0; width: 100%; height: 0%; transition: height 1s linear; }
+        .sand-fill { position: absolute; bottom: 0; width: 100%; height: 0%; transition: height 1s linear; z-index: 1; }
         .lbl-session { font-size: 8px; font-weight: bold; color: #555; text-transform: uppercase; }
         
         /* Active Colors */

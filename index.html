@@ -3,42 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dola 1338 Ultimate Pro</title>
+    <title>Xpikollah ANALYTICS Hub</title>
     <style>
-        body { background: #080808; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 15px; margin: 0; }
-        .app-card { background: #121212; border: 1px solid #333; border-radius: 24px; width: 100%; max-width: 420px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.7); margin-top: 10px; }
+        body { background: #080808; color: #e0e0e0; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 15px; margin: 0; }
+        .app-card { background: #121212; border: 1px solid #333; border-radius: 24px; width: 100%; max-width: 420px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.7); margin-top: 10px; box-sizing: border-box; }
         h2 { color: #f1c40f; text-align: center; font-size: 18px; letter-spacing: 2px; margin-bottom: 20px; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 10px; }
         .input-box { margin-bottom: 15px; width: 100%; }
         label { display: block; font-size: 10px; color: #888; margin-bottom: 5px; text-transform: uppercase; font-weight: bold; }
-        input, select { width: 100%; padding: 14px; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; color: white; box-sizing: border-box; font-size: 15px; outline: none; transition: 0.3s; }
+        input, select { width: 100%; padding: 14px; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; color: white; box-sizing: border-box; font-size: 16px; outline: none; }
         input:focus { border-color: #f1c40f; }
         .fibo-inputs { display: flex; gap: 10px; margin-bottom: 15px; }
-        button { width: 100%; padding: 16px; background: #f1c40f; color: #000; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 14px; margin-top: 10px; transition: 0.2s; }
-        button:active { transform: scale(0.98); }
-        .result-panel { margin-top: 25px; background: #181818; padding: 20px; border-radius: 18px; border: 1px solid #222; display: none; width: 100%; box-sizing: border-box; animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .data-row { display: flex; justify-content: space-between; font-size: 14px; padding: 12px 0; border-bottom: 1px solid #262626; }
+        button { width: 100%; padding: 16px; background: #f1c40f; color: #000; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 14px; margin-top: 10px; }
+        .result-panel { margin-top: 25px; background: #181818; padding: 20px; border-radius: 18px; border: 1px solid #222; display: none; width: 100%; box-sizing: border-box; }
+        .data-row { display: flex; justify-content: space-between; font-size: 15px; padding: 12px 0; border-bottom: 1px solid #262626; }
         .watch-zone { background: rgba(241, 196, 15, 0.1); border: 1px dashed #f1c40f; padding: 15px; border-radius: 12px; margin-bottom: 15px; text-align: center; }
-        .sl-text { color: #ff4444; font-weight: bold; }
-        .tp-text { color: #00ff88; font-weight: bold; }
-        .bias-badge { font-weight: bold; padding: 4px 10px; border-radius: 6px; font-size: 12px; }
+        .bias-badge { font-weight: bold; padding: 6px 12px; border-radius: 6px; font-size: 13px; display: inline-block; }
+        /* WARNA KHAS */
+        .entry-blue { color: #00d2ff; font-weight: bold; }
+        .sl-red { color: #ff4444; font-weight: bold; }
+        .tp-green { color: #00ff88; font-weight: bold; }
+        .brn-gold { color: #f1c40f; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="app-card">
-        <h2>DOLA 1338 ULTIMATE</h2>
+        <h2>1338 PRO ANALYTICS</h2>
         
         <div class="input-box">
-            <label>Harga Semasa (Live)</label>
-            <input type="number" id="price" step="0.01" placeholder="Cth: 4500.00">
+            <label>Harga Semasa</label>
+            <input type="number" id="price" step="0.01" placeholder="Live Price">
         </div>
 
         <div class="input-box">
-            <label>Trend Bias (MA 50/200)</label>
+            <label>Trend (Structure Break)</label>
             <select id="maTrend">
-                <option value="up">BULLISH (Pecah Atas / Harga > MA)</option>
-                <option value="down">BEARISH (Pecah Bawah / Harga < MA)</option>
+                <option value="up">BULLISH (Pecah Atas)</option>
+                <option value="down">BEARISH (Pecah Bawah)</option>
             </select>
         </div>
 
@@ -53,34 +54,33 @@
             </div>
         </div>
 
-        <button onclick="analyze()">ANALYZE SETUP</button>
+        <button onclick="analyze()">KIRA SETUP</button>
 
         <div id="resultPanel" class="result-panel">
-            <div id="biasContainer" style="text-align: center; margin-bottom: 15px;">
+            <div style="text-align: center; margin-bottom: 15px;">
                 <span id="resBias" class="bias-badge"></span>
             </div>
 
             <div class="watch-zone">
-                <label style="color:#f1c40f; font-size:9px;">Zon Perhatian (0.5 - 0.2)</label>
+                <label style="color:#f1c40f; font-size:10px;">ZON REJECTION (0.5 - 0.2)</label>
                 <div id="resWatchZone" style="font-size: 18px; font-weight: bold; margin-top:5px;"></div>
-                <div style="font-size: 10px; color:#888; margin-top:5px;">*Tunggu Candlestick Rejection</div>
             </div>
 
             <div class="data-row">
                 <span>Nearest BRN</span>
-                <span id="resBrn" style="font-weight:bold; color:#f1c40f;"></span>
+                <span id="resBrn" class="brn-gold"></span>
             </div>
             <div class="data-row">
                 <span>Entry Disyorkan (0.2)</span>
-                <span id="resEntry" style="font-weight:bold;"></span>
+                <span id="resEntry" class="entry-blue"></span>
             </div>
             <div class="data-row">
                 <span>Stop Loss (RR 1:2)</span>
-                <span id="resSl" class="sl-text"></span>
+                <span id="resSl" class="sl-red"></span>
             </div>
             <div class="data-row">
-                <span>Target TP 2 (Wajib)</span>
-                <span id="resTp" class="tp-text"></span>
+                <span>TP 2 (WAJIB)</span>
+                <span id="resTp" class="tp-green"></span>
             </div>
         </div>
     </div>
@@ -93,53 +93,47 @@
             const trend = document.getElementById('maTrend').value;
 
             if (isNaN(P) || isNaN(SH) || isNaN(SL)) {
-                alert("Sila masukkan semua maklumat harga!");
+                alert("Sila isi semua harga!");
                 return;
             }
 
             const range = SH - SL;
-            let entry02, entry05, tp2, isSell;
+            let e02, e05, tp2, isSell;
 
             if (trend === "down") {
-                // SELL: 0 di High, 100 di Low. Rejection di 0.2 - 0.5 dari atas.
                 isSell = true;
-                entry02 = SH - (range * 0.2);
-                entry05 = SH - (range * 0.5);
+                e02 = SH - (range * 0.2);
+                e05 = SH - (range * 0.5);
                 tp2 = SH - (range * 1.618);
             } else {
-                // BUY: 0 di Low, 100 di High. Rejection di 0.2 - 0.5 dari bawah.
                 isSell = false;
-                entry02 = SL + (range * 0.2);
-                entry05 = SL + (range * 0.5);
+                e02 = SL + (range * 0.2);
+                e05 = SL + (range * 0.5);
                 tp2 = SL + (range * 1.618);
             }
 
-            // Logik RR 1:2 dari titik Entry 0.2
-            const rewardDist = Math.abs(tp2 - entry02);
-            const riskDist = rewardDist / 2;
-            const stopLoss = isSell ? (entry02 + riskDist) : (entry02 - riskDist);
-
-            // BRN (Gandaan 25)
+            const reward = Math.abs(tp2 - e02);
+            const risk = reward / 2;
+            const slPrice = isSell ? (e02 + risk) : (e02 - risk);
             const brn = Math.round(P / 25) * 25;
 
-            // Paparan Keputusan
             document.getElementById('resBrn').innerText = brn.toFixed(2);
-            document.getElementById('resEntry').innerText = entry02.toFixed(2);
+            document.getElementById('resEntry').innerText = e02.toFixed(2);
             document.getElementById('resWatchZone').innerText = isSell ? 
-                `${entry02.toFixed(2)} - ${entry05.toFixed(2)}` : 
-                `${entry05.toFixed(2)} - ${entry02.toFixed(2)}`;
-            document.getElementById('resSl').innerText = stopLoss.toFixed(2);
+                e02.toFixed(2) + " - " + e05.toFixed(2) : 
+                e05.toFixed(2) + " - " + e02.toFixed(2);
+            document.getElementById('resSl').innerText = slPrice.toFixed(2);
             document.getElementById('resTp').innerText = tp2.toFixed(2);
             
-            const biasEl = document.getElementById('resBias');
+            const b = document.getElementById('resBias');
             if (isSell) {
-                biasEl.innerText = "BEARISH BIAS (SELL)";
-                biasEl.style.background = "rgba(255, 68, 68, 0.2)";
-                biasEl.style.color = "#ff4444";
+                b.innerText = "BEARISH (SELL)";
+                b.style.background = "rgba(255, 68, 68, 0.2)";
+                b.style.color = "#ff4444";
             } else {
-                biasEl.innerText = "BULLISH BIAS (BUY)";
-                biasEl.style.background = "rgba(0, 255, 136, 0.2)";
-                biasEl.style.color = "#00ff88";
+                b.innerText = "BULLISH (BUY)";
+                b.style.background = "rgba(0, 255, 136, 0.2)";
+                b.style.color = "#00ff88";
             }
 
             document.getElementById('resultPanel').style.display = 'block';

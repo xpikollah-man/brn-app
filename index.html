@@ -31,23 +31,25 @@
             width: 100%; max-width: 420px; gap: 10px; margin-bottom: 15px;
         }
         .glass-item {
-            background: #151515; padding: 10px 5px; border-radius: 15px; border: 1px solid #222;
+            background: #151515; padding: 15px 5px; border-radius: 15px; border: 1px solid #222;
             display: flex; flex-direction: column; align-items: center;
         }
+        
+        /* Glass Tube dengan 4 Blok Separuh */
         .glass-tube {
-            width: 14px; height: 60px; background: #222; border-radius: 10px;
-            position: relative; overflow: hidden; margin-bottom: 8px; border: 1px solid #333;
-            /* Penanda 4 Garis (Setiap 2.25 jam / 25%) */
-            background-image: linear-gradient(to bottom, 
-                transparent 24%, rgba(255,255,255,0.2) 24%, rgba(255,255,255,0.2) 26%, 
-                transparent 26%, transparent 49%, rgba(255,255,255,0.5) 49%, rgba(255,255,255,0.5) 51%, 
-                transparent 51%, transparent 74%, rgba(255,255,255,0.2) 74%, rgba(255,255,255,0.2) 76%, 
-                transparent 76%);
+            width: 16px; height: 70px; 
+            display: flex; flex-direction: column-reverse; /* Biar blok menyala dari bawah */
+            gap: 2px; /* Jarak antara blok */
+            margin-bottom: 8px;
         }
-        .sand-fill { position: absolute; bottom: 0; width: 100%; height: 0%; transition: height 1s linear; z-index: 1; }
+        .block {
+            flex: 1; background: #222; border-radius: 2px;
+            transition: background 0.5s ease;
+        }
+
         .lbl-session { font-size: 8px; font-weight: bold; color: #555; text-transform: uppercase; }
         
-        /* Active Colors */
+        /* Active Colors untuk Label */
         .active-syd { color: var(--blue) !important; }
         .active-tky { color: var(--gold) !important; }
         .active-ldn { color: var(--green) !important; }
@@ -74,7 +76,6 @@
 </head>
 <body>
 
-    <!-- Clocks -->
     <div class="master-clock-section">
         <div style="font-size: 10px; color: #888; margin-bottom: 5px;">MALAYSIA (GMT+8)</div>
         <div class="analog-master" id="masterClock">
@@ -84,13 +85,33 @@
     </div>
 
     <div class="session-grid">
-        <div class="glass-item"><div class="glass-tube"><div id="fill-syd" class="sand-fill" style="background:var(--blue)"></div></div><div id="lbl-syd" class="lbl-session">Sydney</div></div>
-        <div class="glass-item"><div class="glass-tube"><div id="fill-tky" class="sand-fill" style="background:var(--gold)"></div></div><div id="lbl-tky" class="lbl-session">Tokyo</div></div>
-        <div class="glass-item"><div class="glass-tube"><div id="fill-ldn" class="sand-fill" style="background:var(--green)"></div></div><div id="lbl-ldn" class="lbl-session">London</div></div>
-        <div class="glass-item"><div class="glass-tube"><div id="fill-ny" class="sand-fill" style="background:var(--red)"></div></div><div id="lbl-ny" class="lbl-session">New York</div></div>
+        <!-- Struktur 4 Blok untuk setiap sesi -->
+        <div class="glass-item">
+            <div class="glass-tube" id="tube-syd">
+                <div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div>
+            </div>
+            <div id="lbl-syd" class="lbl-session">Sydney</div>
+        </div>
+        <div class="glass-item">
+            <div class="glass-tube" id="tube-tky">
+                <div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div>
+            </div>
+            <div id="lbl-tky" class="lbl-session">Tokyo</div>
+        </div>
+        <div class="glass-item">
+            <div class="glass-tube" id="tube-ldn">
+                <div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div>
+            </div>
+            <div id="lbl-ldn" class="lbl-session">London</div>
+        </div>
+        <div class="glass-item">
+            <div class="glass-tube" id="tube-ny">
+                <div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div>
+            </div>
+            <div id="lbl-ny" class="lbl-session">New York</div>
+        </div>
     </div>
 
-    <!-- Analytics -->
     <div class="app-card">
         <input type="number" id="price" placeholder="Live Price">
         <select id="maTrend"><option value="up">BULLISH ↑</option><option value="down">BEARISH ↓</option></select>
@@ -104,7 +125,6 @@
         </div>
     </div>
 
-    <!-- Live USD High/Medium News -->
     <div class="news-box">
         <div class="news-header">🇺🇸 USD LIVE NEWS (HIGH & MEDIUM IMPACT)</div>
         <iframe src="https://sslecal2.forexprostools.com?columns=exc_curr,exc_importance,exc_actual,exc_prev&features=datepicker,timezone&countries=5&calType=day&timeZone=55&lang=1&importance=2,3" width="100%" height="450" frameborder="0" allowtransparency="true"></iframe>
@@ -120,25 +140,41 @@
             document.querySelector('.m-sec').style.transform = `translateX(-50%) rotate(${s*6}deg)`;
 
             const sessions = [
-                { id: 'syd', start: 6, end: 14, color: 'active-syd' },
-                { id: 'tky', start: 8, end: 17, color: 'active-tky' },
-                { id: 'ldn', start: 15, end: 24, color: 'active-ldn' },
-                { id: 'ny', start: 20, end: 30, color: 'active-ny' }
+                { id: 'syd', start: 6, end: 14, color: 'var(--blue)', cls: 'active-syd' },
+                { id: 'tky', start: 8, end: 17, color: 'var(--gold)', cls: 'active-tky' },
+                { id: 'ldn', start: 15, end: 24, color: 'var(--green)', cls: 'active-ldn' },
+                { id: 'ny', start: 20, end: 30, color: 'var(--red)', cls: 'active-ny' }
             ];
 
             sessions.forEach(sess => {
                 let currentH = h;
                 if (sess.id === 'ny' && h < 5) currentH = h + 24;
                 const isActive = currentH >= sess.start && currentH < sess.end;
-                const fill = document.getElementById('fill-' + sess.id);
+                const tube = document.getElementById('tube-' + sess.id);
+                const blocks = tube.getElementsByClassName('block');
                 const lbl = document.getElementById('lbl-' + sess.id);
+
                 if (isActive) {
-                    const progress = ((currentH - sess.start) * 3600 + m * 60 + s) / ((sess.end - sess.start) * 3600) * 100;
-                    fill.style.height = (100 - progress) + "%";
-                    lbl.className = 'lbl-session ' + sess.color;
+                    const totalSec = (sess.end - sess.start) * 3600;
+                    const elapsedSec = (currentH - sess.start) * 3600 + m * 60 + s;
+                    const progress = (elapsedSec / totalSec) * 100;
+                    
+                    lbl.className = 'lbl-session ' + sess.cls;
+
+                    // Nyalakan blok berdasarkan progress (setiap blok = 25%)
+                    for (let i = 0; i < 4; i++) {
+                        if (progress >= (i + 1) * 25) {
+                            blocks[i].style.background = sess.color;
+                        } else if (progress > i * 25) {
+                            // Blok yang sedang berjalan (separa nyala)
+                            blocks[i].style.background = `linear-gradient(to top, ${sess.color} ${((progress % 25) / 25) * 100}%, #222 0%)`;
+                        } else {
+                            blocks[i].style.background = '#222';
+                        }
+                    }
                 } else {
-                    fill.style.height = "0%";
                     lbl.className = 'lbl-session';
+                    for (let b of blocks) b.style.background = '#222';
                 }
             });
         }

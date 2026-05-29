@@ -3,75 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XPIKOLLAH ELITE HUB V4 - LIGHTBULB EDITION</title>
+    <title>XPIKOLLAH ELITE HUB V4 - LEVERAGE PRO</title>
     <style>
         :root { --gold: #f1c40f; --blue: #00d2ff; --red: #ff4444; --green: #00ff88; --bg: #0a0a0a; }
-        body { 
-            background-color: var(--bg); color: #e0e0e0; font-family: 'Segoe UI', sans-serif; 
-            display: flex; flex-direction: column; align-items: center; padding: 10px; margin: 0;
-        }
-
-        /* --- Master Clock & Overlap Bulb --- */
-        .master-clock-section {
-            background: rgba(255,255,255,0.03); width: 100%; max-width: 420px;
-            padding: 20px; border-radius: 28px; border: 1px solid #222; margin-bottom: 15px;
-            display: flex; flex-direction: column; align-items: center; position: relative;
-        }
-        .overlap-badge {
-            position: absolute; top: 15px; right: 25px; display: flex; flex-direction: column; align-items: center;
-            opacity: 0.1; transition: all 0.5s ease;
-        }
-        /* Apabila Overlap Aktif */
-        .overlap-active { 
-            opacity: 1; 
-            filter: drop-shadow(0 0 12px var(--gold)); 
-            transform: scale(1.1);
-        }
+        body { background-color: var(--bg); color: #e0e0e0; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 10px; margin: 0; }
+        .master-clock-section { background: rgba(255,255,255,0.03); width: 100%; max-width: 420px; padding: 20px; border-radius: 28px; border: 1px solid #222; margin-bottom: 15px; display: flex; flex-direction: column; align-items: center; position: relative; }
+        .overlap-badge { position: absolute; top: 15px; right: 25px; display: flex; flex-direction: column; align-items: center; opacity: 0.1; transition: all 0.5s ease; }
+        .overlap-active { opacity: 1; filter: drop-shadow(0 0 12px var(--gold)); transform: scale(1.1); }
         .overlap-icon { font-size: 28px; }
-        .overlap-text { font-size: 8px; font-weight: bold; color: var(--gold); margin-top: 2px; letter-spacing: 1px; }
-
-        .analog-master {
-            width: 80px; height: 80px; border: 3px solid #333; border-radius: 50%;
-            position: relative; background: #111; margin-bottom: 10px;
-        }
+        .overlap-text { font-size: 8px; font-weight: bold; color: var(--gold); margin-top: 2px; }
+        .analog-master { width: 80px; height: 80px; border: 3px solid #333; border-radius: 50%; position: relative; background: #111; margin-bottom: 10px; }
         .master-hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom; background: #fff; border-radius: 10px; }
         .m-hour { width: 3px; height: 25px; z-index: 3; }
         .m-min { width: 2px; height: 35px; z-index: 2; }
         .m-sec { width: 1px; height: 38px; z-index: 1; background: var(--gold); }
-
-        /* --- Session Grid --- */
-        .session-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr);
-            width: 100%; max-width: 420px; gap: 10px; margin-bottom: 15px;
-        }
-        .glass-item {
-            background: #151515; padding: 15px 5px; border-radius: 15px; border: 1px solid #222;
-            display: flex; flex-direction: column; align-items: center;
-        }
+        .session-grid { display: grid; grid-template-columns: repeat(4, 1fr); width: 100%; max-width: 420px; gap: 10px; margin-bottom: 15px; }
+        .glass-item { background: #151515; padding: 15px 5px; border-radius: 15px; border: 1px solid #222; display: flex; flex-direction: column; align-items: center; }
         .glass-tube { width: 18px; height: 70px; display: flex; flex-direction: column; gap: 3px; margin-bottom: 8px; }
         .block { flex: 1; background: #222; border-radius: 3px; }
         .lbl-session { font-size: 8px; font-weight: bold; color: #444; text-transform: uppercase; }
-        
-        /* Active Colors */
-        .active-syd { color: var(--blue) !important; }
-        .active-tky { color: var(--gold) !important; }
-        .active-ldn { color: var(--green) !important; }
-        .active-ny { color: var(--red) !important; }
-
-        /* --- Analytics & Risk --- */
-        .app-card { 
-            background: #141414; border: 1px solid #333; border-radius: 28px; 
-            width: 100%; max-width: 420px; padding: 25px; box-sizing: border-box; margin-bottom: 15px;
-        }
+        .active-syd { color: var(--blue) !important; } .active-tky { color: var(--gold) !important; } .active-ldn { color: var(--green) !important; } .active-ny { color: var(--red) !important; }
+        .app-card { background: #141414; border: 1px solid #333; border-radius: 28px; width: 100%; max-width: 420px; padding: 25px; box-sizing: border-box; margin-bottom: 15px; }
         .input-group { display: flex; gap: 10px; margin-bottom: 10px; }
-        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid #333; border-radius: 12px; color: white; margin-bottom: 10px; font-size: 14px; outline: none; }
+        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid #333; border-radius: 12px; color: white; margin-bottom: 10px; font-size: 13px; outline: none; }
         button { width: 100%; padding: 15px; background: var(--gold); color: #000; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; }
-        
         .result-panel { margin-top: 15px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 20px; display: none; }
         .data-row { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 1px solid #222; }
         .risk-warning { color: var(--red); font-size: 11px; text-align: center; margin-top: 10px; font-weight: bold; }
-
-        /* --- News --- */
         .news-box { width: 100%; max-width: 420px; background: #1a1a1a; border-radius: 24px; overflow: hidden; border: 1px solid #333; }
         .news-ticker { background: #222; color: var(--gold); padding: 10px; text-align: center; font-size: 11px; font-weight: bold; border-bottom: 1px solid #333; }
     </style>
@@ -79,16 +37,9 @@
 <body>
 
     <div class="master-clock-section">
-        <!-- Bulb Overlap Indicator -->
-        <div id="overlapBulb" class="overlap-badge">
-            <span class="overlap-icon">💡</span>
-            <span id="overlapText" class="overlap-text">NO OVERLAP</span>
-        </div>
-        
+        <div id="overlapBulb" class="overlap-badge"><span class="overlap-icon">💡</span><span id="overlapText" class="overlap-text">NO OVERLAP</span></div>
         <div style="font-size: 10px; color: #888; margin-bottom: 5px;">MALAYSIA (GMT+8)</div>
-        <div class="analog-master" id="masterClock">
-            <div class="master-hand m-hour"></div><div class="master-hand m-min"></div><div class="master-hand m-sec"></div>
-        </div>
+        <div class="analog-master"><div class="master-hand m-hour"></div><div class="master-hand m-min"></div><div class="master-hand m-sec"></div></div>
         <div id="digitalTime" style="font-size: 18px; font-weight: bold; letter-spacing: 2px;">00:00:00</div>
     </div>
 
@@ -99,107 +50,84 @@
         <div class="glass-item"><div class="glass-tube" id="tube-ny"><div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div></div><div id="lbl-ny" class="lbl-session">New York</div></div>
     </div>
 
-    <!-- Analytics & Risk Management -->
     <div class="app-card">
         <div class="input-group">
-            <input type="number" id="balance" placeholder="Balance ($)">
-            <input type="number" id="riskPerc" placeholder="Risk %" value="1">
+            <input type="number" id="balance" placeholder="Bal ($)">
+            <input type="number" id="riskPerc" placeholder="Risk %" value="10">
+            <select id="lev"><option value="500">1:500</option><option value="1000">1:1000</option><option value="2000">1:2000</option><option value="30">1:30</option></select>
         </div>
-        <input type="number" id="price" placeholder="Live Price">
+        <input type="number" id="price" placeholder="Current Price (e.g. 2350.00)">
         <div class="input-group">
             <input type="number" id="sh" placeholder="High"><input type="number" id="sl" placeholder="Low">
         </div>
         <select id="maTrend"><option value="up">BULLISH ↑</option><option value="down">BEARISH ↓</option></select>
-        <button onclick="analyze()">EXECUTE ANALYTICS</button>
+        <button onclick="analyze()">EXECUTE TRADE PLAN</button>
 
         <div id="resultPanel" class="result-panel">
-            <div class="data-row"><span>BIAS</span><span id="resBias" style="font-weight:bold;"></span></div>
-            <div class="data-row"><span>ENTRY</span><span id="resEntry" style="color:var(--blue); font-weight:bold;"></span></div>
-            <div class="data-row"><span>STOP LOSS</span><span id="resSl" style="color:var(--red); font-weight:bold;"></span></div>
-            <div class="data-row"><span>TAKE PROFIT</span><span id="resTp" style="color:var(--green); font-weight:bold;"></span></div>
-            <hr style="border:0; border-top:1px solid #222; margin:10px 0;">
-            <div class="data-row" style="color:var(--gold);"><span>REC. LOT</span><span id="resLot" style="font-weight:bold;"></span></div>
-            <div class="data-row"><span>MAX LOSS</span><span id="resLoss" style="color:var(--red);"></span></div>
+            <div class="data-row"><span>BIAS / ENTRY</span><span id="resEntry" style="font-weight:bold;"></span></div>
+            <div class="data-row"><span>STOP LOSS / TP</span><span id="resSlTp" style="font-size:11px;"></span></div>
+            <hr style="border:0; border-top:1px solid #333;">
+            <div class="data-row" style="color:var(--gold);"><span>RECOMMENDED LOT</span><span id="resLot" style="font-weight:bold;"></span></div>
+            <div class="data-row"><span>EST. MARGIN REQ.</span><span id="resMargin"></span></div>
             <div id="mcWarning" class="risk-warning"></div>
         </div>
     </div>
 
     <div class="news-box">
-        <div class="news-ticker">⚠️ MONITOR USD NEWS IMPACT</div>
-        <iframe src="https://sslecal2.forexprostools.com?columns=exc_curr,exc_importance,exc_actual,exc_prev&features=datepicker,timezone&countries=5&calType=day&timeZone=55&lang=1&importance=2,3" width="100%" height="400" frameborder="0" allowtransparency="true"></iframe>
+        <div class="news-ticker">⚠️ MONITOR NEWS IMPACT</div>
+        <iframe src="https://sslecal2.forexprostools.com?columns=exc_curr,exc_importance,exc_actual,exc_prev&features=datepicker,timezone&countries=5&calType=day&timeZone=55&lang=1&importance=2,3" width="100%" height="300" frameborder="0" allowtransparency="true"></iframe>
     </div>
 
     <script>
         function updateEngine() {
-            const now = new Date();
-            const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+            const now = new Date(), h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
             document.getElementById('digitalTime').innerText = now.toLocaleTimeString('en-GB');
             document.querySelector('.m-hour').style.transform = `translateX(-50%) rotate(${(h%12)*30+m*0.5}deg)`;
             document.querySelector('.m-min').style.transform = `translateX(-50%) rotate(${m*6}deg)`;
             document.querySelector('.m-sec').style.transform = `translateX(-50%) rotate(${s*6}deg)`;
-
-            const sessions = [
-                { id: 'syd', start: 6, end: 14, color: 'var(--blue)', cls: 'active-syd' },
-                { id: 'tky', start: 8, end: 17, color: 'var(--gold)', cls: 'active-tky' },
-                { id: 'ldn', start: 15, end: 24, color: 'var(--green)', cls: 'active-ldn' },
-                { id: 'ny', start: 20, end: 30, color: 'var(--red)', cls: 'active-ny' }
-            ];
-
+            const sessions = [ { id:'syd',s:6,e:14,c:'var(--blue)',cl:'active-syd' }, { id:'tky',s:8,e:17,c:'var(--gold)',cl:'active-tky' }, { id:'ldn',s:15,e:24,c:'var(--green)',cl:'active-ldn' }, { id:'ny',s:20,e:30,c:'var(--red)',cl:'active-ny' } ];
             let activeCount = 0;
             sessions.forEach(sess => {
-                let currH = h; if (sess.id === 'ny' && h < 6) currH = h + 24; 
-                const isActive = currH >= sess.start && currH < sess.end;
-                const blocks = document.getElementById('tube-' + sess.id).getElementsByClassName('block');
-                const lbl = document.getElementById('lbl-' + sess.id);
-
-                if (isActive) {
-                    activeCount++;
-                    const totalSec = (sess.end - sess.start) * 3600;
-                    const elapsedSec = (currH - sess.start) * 3600 + m * 60 + s;
-                    const remaining = ((totalSec - elapsedSec) / totalSec) * 100;
-                    lbl.className = 'lbl-session ' + sess.cls;
-                    for (let i = 0; i < 4; i++) {
-                        let topT = (4-i)*25, botT = (3-i)*25;
-                        if (remaining >= topT) blocks[i].style.background = sess.color;
-                        else if (remaining > botT) blocks[i].style.background = `linear-gradient(to top, ${sess.color} ${((remaining-botT)/25)*100}%, #222 0%)`;
-                        else blocks[i].style.background = '#222';
-                    }
-                } else {
-                    lbl.className = 'lbl-session';
-                    for (let b of blocks) b.style.background = '#222';
-                }
+                let curH = h; if(sess.id==='ny' && h<6) curH=h+24;
+                const active = curH >= sess.s && curH < sess.e;
+                const blocks = document.getElementById('tube-'+sess.id).getElementsByClassName('block');
+                const lbl = document.getElementById('lbl-'+sess.id);
+                if(active){ activeCount++; lbl.className='lbl-session '+sess.cl;
+                    const rem = (((sess.e-curH)*3600)-(m*60)-s)/((sess.e-sess.s)*3600)*100;
+                    for(let i=0;i<4;i++){ let t=(4-i)*25, b=(3-i)*25; if(rem>=t) blocks[i].style.background=sess.c; else if(rem>b) blocks[i].style.background=`linear-gradient(to top, ${sess.c} ${((rem-b)/25)*100}%, #222 0%)`; else blocks[i].style.background='#222'; }
+                } else { lbl.className='lbl-session'; for(let b of blocks) b.style.background='#222'; }
             });
-
-            // Logic Overlap Mentol (Jika lebih 1 sesi aktif)
             const bulb = document.getElementById('overlapBulb');
-            const bulbText = document.getElementById('overlapText');
-            if (activeCount > 1) {
-                bulb.classList.add('overlap-active');
-                bulbText.innerText = "IDEA OVERLAP";
-            } else {
-                bulb.classList.remove('overlap-active');
-                bulbText.innerText = "NO OVERLAP";
-            }
+            if(activeCount>1){ bulb.classList.add('overlap-active'); document.getElementById('overlapText').innerText="IDEA OVERLAP"; }
+            else { bulb.classList.remove('overlap-active'); document.getElementById('overlapText').innerText="NO OVERLAP"; }
         }
         setInterval(updateEngine, 1000); updateEngine();
 
         function analyze() {
-            const bal = parseFloat(document.getElementById('balance').value), risk = parseFloat(document.getElementById('riskPerc').value), P = parseFloat(document.getElementById('price').value), SH = parseFloat(document.getElementById('sh').value), SL = parseFloat(document.getElementById('sl').value), trend = document.getElementById('maTrend').value;
-            if (isNaN(P)||isNaN(SH)||isNaN(SL)||isNaN(bal)) return;
+            const bal = parseFloat(document.getElementById('balance').value), risk = parseFloat(document.getElementById('riskPerc').value), lev = parseFloat(document.getElementById('lev').value), P = parseFloat(document.getElementById('price').value), SH = parseFloat(document.getElementById('sh').value), SL = parseFloat(document.getElementById('sl').value), trend = document.getElementById('maTrend').value;
+            if(isNaN(P)||isNaN(bal)) return;
             const range = SH-SL; let entry, tp, slVal, isSell = trend === "down";
-            if(isSell){ entry = SH-(range*0.2); tp = SH-(range*1.618); slVal = entry+(Math.abs(tp-entry)*0.5); }
-            else { entry = SL+(range*0.2); tp = SL+(range*1.618); slVal = entry-(Math.abs(tp-entry)*0.5); }
-            const pipsRisk = Math.abs(entry-slVal)*100, amountAtRisk = bal*(risk/100), lot = (amountAtRisk/(pipsRisk*10)).toFixed(2);
-            document.getElementById('resEntry').innerText = entry.toFixed(2);
-            document.getElementById('resSl').innerText = slVal.toFixed(2);
-            document.getElementById('resTp').innerText = tp.toFixed(2);
-            document.getElementById('resBias').innerText = isSell ? "SELL" : "BUY";
-            document.getElementById('resBias').style.color = isSell ? "var(--red)" : "var(--green)";
-            document.getElementById('resLot').innerText = lot > 0 ? lot : "0.01";
-            document.getElementById('resLoss').innerText = "- $" + amountAtRisk.toFixed(2);
+            if(isSell){ entry=SH-(range*0.2); tp=SH-(range*1.618); slVal=entry+(Math.abs(tp-entry)*0.5); }
+            else { entry=SL+(range*0.2); tp=SL+(range*1.618); slVal=entry-(Math.abs(tp-entry)*0.5); }
+            
+            // Pengiraan Lot Berdasarkan Risk
+            const pipsRisk = Math.abs(entry-slVal)*100;
+            const amountAtRisk = bal*(risk/100);
+            let lot = (amountAtRisk/(pipsRisk*10)).toFixed(2);
+            if(lot < 0.01) lot = 0.01;
+
+            // Pengiraan Margin Required (Formula: Price * Lot * 100,000 / Leverage)
+            const marginReq = (P * lot * 100000 / lev) / 100; // Simplified for Gold/Forex context
+            
+            document.getElementById('resEntry').innerText = (isSell?"SELL @ ":"BUY @ ") + entry.toFixed(2);
+            document.getElementById('resSlTp').innerText = "SL: "+slVal.toFixed(2)+" | TP: "+tp.toFixed(2);
+            document.getElementById('resLot').innerText = lot;
+            document.getElementById('resMargin').innerText = "$"+marginReq.toFixed(2);
+            
             const warn = document.getElementById('mcWarning');
-            if(amountAtRisk > (bal*0.3)) { warn.innerText = "⚠️ HIGH RISK!"; warn.style.color = "var(--red)"; }
-            else { warn.innerText = "SAFE RISK"; warn.style.color = "var(--green)"; }
+            if(marginReq > bal) { warn.innerText = "❌ INSUFFICIENT MARGIN! REDUCE LOT"; warn.style.color="var(--red)"; }
+            else if(amountAtRisk > (bal*0.2)) { warn.innerText = "⚠️ HIGH RISK ALERT!"; warn.style.color="var(--red)"; }
+            else { warn.innerText = "✅ PLAN VALIDATED"; warn.style.color="var(--green)"; }
             document.getElementById('resultPanel').style.display = 'block';
         }
     </script>

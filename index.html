@@ -3,126 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dola 1338 Pro - RR 1:2</title>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <title>Dola 1338 Ultimate</title>
     <style>
         body { background: #080808; color: #e0e0e0; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 15px; margin: 0; }
-        .app-card { background: #121212; border: 1px solid #333; border-radius: 24px; width: 100%; max-width: 420px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.7); }
+        .app-card { background: #121212; border: 1px solid #333; border-radius: 24px; width: 100%; max-width: 400px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.7); margin-top: 20px; }
         h2 { color: #f1c40f; text-align: center; font-size: 16px; letter-spacing: 2px; margin-bottom: 20px; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        .input-box { margin-bottom: 15px; }
+        .input-box { margin-bottom: 15px; width: 100%; }
         label { display: block; font-size: 10px; color: #666; margin-bottom: 5px; text-transform: uppercase; font-weight: bold; }
-        input, select { width: 100%; padding: 12px; background: #1a1a1a; border: 1px solid #333; border-radius: 10px; color: white; box-sizing: border-box; font-size: 15px; }
+        input, select { width: 100%; padding: 12px; background: #1a1a1a; border: 1px solid #333; border-radius: 10px; color: white; box-sizing: border-box; font-size: 15px; outline: none; }
+        input:focus { border-color: #f1c40f; }
         button { width: 100%; padding: 15px; background: #f1c40f; color: #000; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 14px; margin-top: 10px; }
-        .result-panel { margin-top: 20px; background: #181818; padding: 18px; border-radius: 16px; border: 1px solid #222; }
+        .result-panel { margin-top: 20px; background: #181818; padding: 18px; border-radius: 16px; border: 1px solid #222; display: none; width: 100%; box-sizing: border-box; }
         .data-row { display: flex; justify-content: space-between; font-size: 13px; padding: 10px 0; border-bottom: 1px solid #262626; }
-        .rr-badge { background: rgba(241, 196, 15, 0.2); color: #f1c40f; padding: 5px 10px; border-radius: 5px; font-size: 10px; font-weight: bold; }
+        .rr-badge { background: rgba(241, 196, 15, 0.2); color: #f1c40f; padding: 5px 10px; border-radius: 5px; font-size: 10px; font-weight: bold; display: block; margin: 0 auto 15px auto; width: fit-content; }
         .sl-text { color: #ff4444; font-weight: bold; }
         .tp-text { color: #00ff88; font-weight: bold; }
+        .bias-text { font-weight: bold; padding: 4px 8px; border-radius: 4px; }
     </style>
 </head>
 <body>
-    <div id="root"></div>
-    <script type="text/babel">
-        const { useState } = React;
 
-        function App() {
-            const [price, setPrice] = useState("");
-            const [maTrend, setMaTrend] = useState("up");
-            const [sh, setSh] = useState("");
-            const [sl, setSl] = useState("");
-            const [res, setRes] = useState(null);
+    <div class="app-card">
+        <h2>DOLA 1338 ULTIMATE</h2>
+        
+        <div class="input-box">
+            <label>Harga Semasa</label>
+            <input type="number" id="price" step="0.01" placeholder="Live Price">
+        </div>
 
-            const analyze = () => {
-                const P = parseFloat(price);
-                const SH = parseFloat(sh);
-                const SL_Price = parseFloat(sl);
+        <div class="input-box">
+            <label>Trend MA Bias</label>
+            <select id="maTrend">
+                <option value="up">BULLISH (Harga > MA200)</option>
+                <option value="down">BEARISH (Harga < MA200)</option>
+            </select>
+        </div>
 
-                if (isNaN(P) || isNaN(SH) || isNaN(SL_Price)) return alert("Sila masukkan semua harga!");
+        <div style="display:flex; gap:10px;" class="input-box">
+            <div style="flex:1">
+                <label>Swing High</label>
+                <input type="number" id="sh" step="0.01" placeholder="High">
+            </div>
+            <div style="flex:1">
+                <label>Swing Low</label>
+                <input type="number" id="sl" step="0.01" placeholder="Low">
+            </div>
+        </div>
 
-                const diff = SL_Price - SH;
-                
-                // Level Fibo sedia ada
-                const lowRiskEntry = SH + (diff * 0.2);
-                const tp2Wajib = SH + (diff * 1.618);
-                
-                // Kira Jarak Reward (Entry 0.2 ke TP2 1.618)
-                const rewardDist = Math.abs(tp2Wajib - lowRiskEntry);
-                
-                // Kira Jarak Risk (Nisbah 1:2, maka Risk = Reward / 2)
-                const riskDist = rewardDist / 2;
+        <button onclick="analyze()">CALCULATE SETUP</button>
 
-                // Tentukan kedudukan SL (Jika Sell, SL di atas Entry. Jika Buy, SL di bawah Entry)
-                const stopLossPrice = maTrend === "down" ? lowRiskEntry + riskDist : lowRiskEntry - riskDist;
+        <div id="resultPanel" class="result-panel">
+            <span class="rr-badge">RISK REWARD 1:2 (FIXED)</span>
+            
+            <div class="data-row">
+                <span>Nearest BRN</span>
+                <span id="resBrn" style="color:#f1c40f; font-weight:bold;"></span>
+            </div>
+            <div class="data-row">
+                <span>Suggested Action</span>
+                <span id="resBias" class="bias-text"></span>
+            </div>
+            <div class="data-row">
+                <span>Entry Price (0.2)</span>
+                <span id="resEntry" style="font-weight:bold;"></span>
+            </div>
+            <div class="data-row">
+                <span>STOP LOSS</span>
+                <span id="resSl" class="sl-text"></span>
+            </div>
+            <div class="data-row">
+                <span>TP 2 (WAJIB)</span>
+                <span id="resTp" class="tp-text"></span>
+            </div>
+            
+            <p style="font-size:10px; color:#666; text-align:center; margin-top:15px;">
+                *Tunggu Rejection Candlestick di zon 0.5 - 0.2 sebelum entry.
+            </p>
+        </div>
+    </div>
 
-                setRes({
-                    brn: Math.round(P / 25) * 25,
-                    entry: lowRiskEntry,
-                    tp2: tp2Wajib,
-                    sl: stopLossPrice,
-                    bias: maTrend === "up" ? "BUY" : "SELL"
-                });
-            };
+    <script>
+        function analyze() {
+            const P = parseFloat(document.getElementById('price').value);
+            const SH = parseFloat(document.getElementById('sh').value);
+            const SL_Val = parseFloat(document.getElementById('sl').value);
+            const maTrend = document.getElementById('maTrend').value;
 
-            return (
-                <div className="app-card">
-                    <h2>DOLA 1338 ULTIMATE</h2>
-                    <div className="input-box">
-                        <label>Harga Semasa</label>
-                        <input type="number" step="0.01" value={price} onChange={(e)=>setPrice(e.target.value)} />
-                    </div>
-                    <div className="input-box">
-                        <label>Trend MA Bias</label>
-                        <select value={maTrend} onChange={(e)=>setMaTrend(e.target.value)}>
-                            <option value="up">BULLISH (Harga > MA200)</option>
-                            <option value="down">BEARISH (Harga < MA200)</option>
-                        </select>
-                    </div>
-                    <div style={{display:'flex', gap:'10px'}} className="input-box">
-                        <div style={{flex:1}}>
-                            <label>Swing High</label>
-                            <input type="number" step="0.01" value={sh} onChange={(e)=>setSh(e.target.value)} />
-                        </div>
-                        <div style={{flex:1}}>
-                            <label>Swing Low</label>
-                            <input type="number" step="0.01" value={sl} onChange={(e)=>setSl(e.target.value)} />
-                        </div>
-                    </div>
-                    <button onClick={analyze}>CALCULATE SETUP</button>
+            if (isNaN(P) || isNaN(SH) || isNaN(SL_Val)) {
+                alert("Sila masukkan semua harga!");
+                return;
+            }
 
-                    {res && (
-                        <div className="result-panel">
-                            <div style={{textAlign:'center', marginBottom:'15px'}}>
-                                <span className="rr-badge">RISK REWARD 1:2 (FIXED)</span>
-                            </div>
-                            <div className="data-row">
-                                <span>Suggested Action</span>
-                                <span style={{color: res.bias === "BUY" ? "#00ff88" : "#ff4444", fontWeight:'bold'}}>{res.bias} @ 0.2 Zone</span>
-                            </div>
-                            <div className="data-row">
-                                <span>Entry Price (0.2)</span>
-                                <span style={{fontWeight:'bold'}}>{res.entry.toFixed(2)}</span>
-                            </div>
-                            <div className="data-row">
-                                <span>STOP LOSS</span>
-                                <span className="sl-text">{res.sl.toFixed(2)}</span>
-                            </div>
-                            <div className="data-row">
-                                <span>TP 2 (WAJIB)</span>
-                                <span className="tp-text">{res.tp2.toFixed(2)}</span>
-                            </div>
-                            <div style={{fontSize:'10px', color:'#666', marginTop:'15px', textAlign:'center'}}>
-                                *Tunggu Rejection di zon {res.entry.toFixed(2)} sebelum entry.
-                            </div>
-                        </div>
-                    )}
-                </div>
-            );
+            const diff = SL_Val - SH;
+            const lowRiskEntry = SH + (diff * 0.2);
+            const tp2Wajib = SH + (diff * 1.618);
+            
+            // Logik RR 1:2
+            const rewardDist = Math.abs(tp2Wajib - lowRiskEntry);
+            const riskDist = rewardDist / 2;
+
+            // Tentukan SL berdasarkan Trend MA
+            // Jika MA Trend DOWN (Sell), SL mesti di atas Entry
+            // Jika MA Trend UP (Buy), SL mesti di bawah Entry
+            const stopLossPrice = (maTrend === "down") ? (lowRiskEntry + riskDist) : (lowRiskEntry - riskDist);
+
+            // BRN terdekat (setiap 25)
+            const brn = Math.round(P / 25) * 25;
+
+            // Paparkan Keputusan
+            document.getElementById('resBrn').innerText = brn.toFixed(2);
+            document.getElementById('resEntry').innerText = lowRiskEntry.toFixed(2);
+            document.getElementById('resSl').innerText = stopLossPrice.toFixed(2);
+            document.getElementById('resTp').innerText = tp2Wajib.toFixed(2);
+            
+            const biasEl = document.getElementById('resBias');
+            if (maTrend === "up") {
+                biasEl.innerText = "BUY @ 0.2";
+                biasEl.style.color = "#00ff88";
+            } else {
+                biasEl.innerText = "SELL @ 0.2";
+                biasEl.style.color = "#ff4444";
+            }
+
+            document.getElementById('resultPanel').style.display = 'block';
         }
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
     </script>
 </body>
 </html>

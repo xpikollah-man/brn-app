@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XPIKOLLAH ELITE HUB V4 - COUNTDOWN</title>
+    <title>XPIKOLLAH ELITE HUB V4</title>
     <style>
         :root { --gold: #f1c40f; --blue: #00d2ff; --red: #ff4444; --green: #00ff88; --bg: #0a0a0a; }
         body { 
@@ -11,7 +11,6 @@
             display: flex; flex-direction: column; align-items: center; padding: 10px; margin: 0;
         }
 
-        /* --- Master Clock & Sessions --- */
         .master-clock-section {
             background: rgba(255,255,255,0.03); width: 100%; max-width: 420px;
             padding: 20px; border-radius: 28px; border: 1px solid #222; margin-bottom: 15px;
@@ -35,10 +34,9 @@
             display: flex; flex-direction: column; align-items: center;
         }
         
-        /* Glass Tube Countdown */
         .glass-tube {
             width: 18px; height: 70px; 
-            display: flex; flex-direction: column; /* Countdown dari atas ke bawah */
+            display: flex; flex-direction: column; 
             gap: 3px; 
             margin-bottom: 8px;
         }
@@ -47,15 +45,13 @@
             transition: background 0.3s ease;
         }
 
-        .lbl-session { font-size: 8px; font-weight: bold; color: #555; text-transform: uppercase; margin-top: 4px; }
+        .lbl-session { font-size: 8px; font-weight: bold; color: #444; text-transform: uppercase; margin-top: 4px; }
         
-        /* Active Colors */
         .active-syd { color: var(--blue) !important; }
         .active-tky { color: var(--gold) !important; }
         .active-ldn { color: var(--green) !important; }
         .active-ny { color: var(--red) !important; }
 
-        /* --- Analysis Hub --- */
         .app-card { 
             background: #141414; border: 1px solid #333; border-radius: 28px; 
             width: 100%; max-width: 420px; padding: 25px; box-sizing: border-box; margin-bottom: 15px;
@@ -84,33 +80,13 @@
     </div>
 
     <div class="session-grid">
-        <div class="glass-item">
-            <div class="glass-tube" id="tube-syd">
-                <div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div>
-            </div>
-            <div id="lbl-syd" class="lbl-session">Sydney</div>
-        </div>
-        <div class="glass-item">
-            <div class="glass-tube" id="tube-tky">
-                <div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div>
-            </div>
-            <div id="lbl-tky" class="lbl-session">Tokyo</div>
-        </div>
-        <div class="glass-item">
-            <div class="glass-tube" id="tube-ldn">
-                <div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div>
-            </div>
-            <div id="lbl-ldn" class="lbl-session">London</div>
-        </div>
-        <div class="glass-item">
-            <div class="glass-tube" id="tube-ny">
-                <div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div>
-            </div>
-            <div id="lbl-ny" class="lbl-session">New York</div>
-        </div>
+        <div class="glass-item"><div class="glass-tube" id="tube-syd"><div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div></div><div id="lbl-syd" class="lbl-session">Sydney</div></div>
+        <div class="glass-item"><div class="glass-tube" id="tube-tky"><div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div></div><div id="lbl-tky" class="lbl-session">Tokyo</div></div>
+        <div class="glass-item"><div class="glass-tube" id="tube-ldn"><div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div></div><div id="lbl-ldn" class="lbl-session">London</div></div>
+        <div class="glass-item"><div class="glass-tube" id="tube-ny"><div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div></div><div id="lbl-ny" class="lbl-session">New York</div></div>
     </div>
 
-    <!-- Analytics & News tetap sama -->
+    <!-- Analytics & News -->
     <div class="app-card">
         <input type="number" id="price" placeholder="Live Price">
         <select id="maTrend"><option value="up">BULLISH ↑</option><option value="down">BEARISH ↓</option></select>
@@ -147,29 +123,24 @@
 
             sessions.forEach(sess => {
                 let currentH = h;
-                if (sess.id === 'ny' && h < 5) currentH = h + 24;
+                if (sess.id === 'ny' && h < 6) currentH = h + 24; 
+                
                 const isActive = currentH >= sess.start && currentH < sess.end;
-                const tube = document.getElementById('tube-' + sess.id);
-                const blocks = tube.getElementsByClassName('block'); // Index 0 (Top) to 3 (Bottom)
+                const blocks = document.getElementById('tube-' + sess.id).getElementsByClassName('block');
                 const lbl = document.getElementById('lbl-' + sess.id);
 
                 if (isActive) {
                     const totalSec = (sess.end - sess.start) * 3600;
                     const elapsedSec = (currentH - sess.start) * 3600 + m * 60 + s;
                     const remainingProgress = ((totalSec - elapsedSec) / totalSec) * 100;
-                    
                     lbl.className = 'lbl-session ' + sess.cls;
 
-                    // Countdown Logic: Blok padam dari atas ke bawah
                     for (let i = 0; i < 4; i++) {
-                        // Terbalikkan i untuk semak dari bawah (3, 2, 1, 0)
                         let blockThreshold = (3 - i + 1) * 25; 
                         let lowerThreshold = (3 - i) * 25;
-
                         if (remainingProgress >= blockThreshold) {
                             blocks[i].style.background = sess.color;
                         } else if (remainingProgress > lowerThreshold) {
-                            // Blok sedang menyusut
                             let subProgress = ((remainingProgress - lowerThreshold) / 25) * 100;
                             blocks[i].style.background = `linear-gradient(to top, ${sess.color} ${subProgress}%, #222 0%)`;
                         } else {

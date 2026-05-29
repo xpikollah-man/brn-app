@@ -3,156 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XPIKOLLAH ANALYSIS HUB</title>
+    <title>XPIKOLLAH ELITE HUB V4</title>
     <style>
-        :root { --gold: #f1c40f; --blue: #00d2ff; --red: #ff4444; --green: #00ff88; --bg: #080808; }
+        :root { --gold: #f1c40f; --blue: #00d2ff; --red: #ff4444; --green: #00ff88; --bg: #0a0a0a; }
         body { 
-            background: radial-gradient(circle at center, #1a1a1a 0%, var(--bg) 100%);
-            background-color: var(--bg);
-            color: #e0e0e0; font-family: 'Segoe UI', sans-serif; 
-            display: flex; flex-direction: column; align-items: center; 
-            padding: 10px; margin: 0; min-height: 100vh;
+            background-color: var(--bg); color: #e0e0e0; font-family: 'Segoe UI', sans-serif; 
+            display: flex; flex-direction: column; align-items: center; padding: 10px; margin: 0;
         }
-        /* Background Texture */
-        body::before {
-            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: linear-gradient(45deg, #0f0f0f 25%, transparent 25%), 
-                              linear-gradient(-45deg, #0f0f0f 25%, transparent 25%), 
-                              linear-gradient(45deg, transparent 75%, #0f0f0f 75%), 
-                              linear-gradient(-45deg, transparent 75%, #0f0f0f 75%);
-            background-size: 4px 4px; z-index: -1; opacity: 0.2;
-        }
-        /* Clocks Section */
-        .clock-container {
-            display: grid; grid-template-columns: repeat(5, 1fr);
-            width: 100%; max-width: 450px; gap: 5px; margin-bottom: 15px;
-            padding: 15px 5px; background: rgba(0,0,0,0.6); border-radius: 20px; border: 1px solid #333;
-        }
-        .clock-item { display: flex; flex-direction: column; align-items: center; }
-        .analog-clock {
-            width: 45px; height: 45px; border: 2px solid #444; border-radius: 50%;
-            position: relative; background: #111; margin-bottom: 5px;
-        }
-        .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom; background: #fff; border-radius: 10px; }
-        .hour-hand { width: 2.5px; height: 12px; z-index: 3; }
-        .min-hand { width: 1.5px; height: 18px; z-index: 2; }
-        .sec-hand { width: 1px; height: 19px; z-index: 1; background: var(--red); }
-        .clock-label { font-size: 7px; font-weight: bold; color: #555; text-transform: uppercase; }
-        .clock-label.active { color: var(--gold); }
 
-        /* Main Card */
+        /* --- Master Clock & Sessions --- */
+        .master-clock-section {
+            background: rgba(255,255,255,0.03); width: 100%; max-width: 420px;
+            padding: 20px; border-radius: 28px; border: 1px solid #222; margin-bottom: 15px;
+            display: flex; flex-direction: column; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .analog-master {
+            width: 80px; height: 80px; border: 3px solid #333; border-radius: 50%;
+            position: relative; background: #111; margin-bottom: 10px;
+        }
+        .master-hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom; background: #fff; border-radius: 10px; }
+        .m-hour { width: 3px; height: 25px; z-index: 3; }
+        .m-min { width: 2px; height: 35px; z-index: 2; }
+        .m-sec { width: 1px; height: 38px; z-index: 1; background: var(--gold); }
+
+        .session-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            width: 100%; max-width: 420px; gap: 10px; margin-bottom: 15px;
+        }
+        .glass-item {
+            background: #151515; padding: 10px 5px; border-radius: 15px; border: 1px solid #222;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .glass-tube {
+            width: 10px; height: 50px; background: #222; border-radius: 10px;
+            position: relative; overflow: hidden; margin-bottom: 8px;
+        }
+        .sand-fill { position: absolute; bottom: 0; width: 100%; height: 0%; transition: height 1s linear; }
+        .lbl-session { font-size: 8px; font-weight: bold; color: #555; text-transform: uppercase; }
+        
+        /* Active Colors */
+        .active-syd { color: var(--blue) !important; }
+        .active-tky { color: var(--gold) !important; }
+        .active-ldn { color: var(--green) !important; }
+        .active-ny { color: var(--red) !important; }
+
+        /* --- Analysis Hub --- */
         .app-card { 
-            background: rgba(20, 20, 20, 0.95); border: 1px solid #333; border-radius: 28px; 
-            width: 100%; max-width: 420px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.9);
-            box-sizing: border-box; backdrop-filter: blur(15px); margin-bottom: 20px;
+            background: #141414; border: 1px solid #333; border-radius: 28px; 
+            width: 100%; max-width: 420px; padding: 25px; box-sizing: border-box; margin-bottom: 15px;
         }
-        h2 { color: var(--gold); text-align: center; font-size: 16px; letter-spacing: 3px; margin: 0 0 20px 0; text-transform: uppercase; }
-        .input-box { margin-bottom: 12px; }
-        label { display: block; font-size: 9px; color: #777; margin-bottom: 4px; text-transform: uppercase; }
-        input, select { width: 100%; padding: 12px; background: #0f0f0f; border: 1px solid #333; border-radius: 12px; color: white; font-size: 16px; outline: none; box-sizing: border-box; }
-        button { width: 100%; padding: 16px; background: linear-gradient(135deg, #f1c40f, #d4ac0d); color: #000; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; margin-top: 10px; }
+        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid #333; border-radius: 12px; color: white; margin-bottom: 10px; font-size: 15px; outline: none; }
+        button { width: 100%; padding: 15px; background: var(--gold); color: #000; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; }
+        
+        .result-panel { margin-top: 15px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 20px; display: none; }
+        .data-row { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 1px solid #222; }
 
-        /* Results Display */
-        .result-panel { margin-top: 20px; background: rgba(255,255,255,0.02); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); display: none; }
-        .watch-zone { border-left: 4px solid var(--gold); padding: 12px; background: rgba(241,196,15,0.05); margin-bottom: 15px; }
-        .data-row { display: flex; justify-content: space-between; font-size: 14px; padding: 10px 0; border-bottom: 1px solid #222; }
-
-        /* News Section - Filtered USD */
-        .news-container { width: 100%; max-width: 420px; border-radius: 24px; overflow: hidden; border: 1px solid #333; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .news-header { background: #1a1a1a; color: var(--gold); padding: 12px; text-align: center; font-size: 11px; font-weight: bold; border-bottom: 1px solid #333; letter-spacing: 1px; }
+        /* --- Live News Container --- */
+        .news-box {
+            width: 100%; max-width: 420px; background: #1a1a1a; border-radius: 24px; 
+            overflow: hidden; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .news-header { background: #222; color: var(--gold); padding: 12px; text-align: center; font-size: 11px; font-weight: bold; border-bottom: 1px solid #333; }
     </style>
 </head>
 <body>
 
     <!-- Clocks -->
-    <div class="clock-container">
-        <div class="clock-item"><div class="analog-clock" id="clock-my"><div class="hand hour-hand"></div><div class="hand min-hand"></div><div class="hand sec-hand"></div></div><div class="clock-label active">MY (GMT+8)</div></div>
-        <div class="clock-item"><div class="analog-clock" id="clock-syd"><div class="hand hour-hand"></div><div class="hand min-hand"></div><div class="hand sec-hand"></div></div><div class="clock-label" id="lbl-syd">SYDNEY</div></div>
-        <div class="clock-item"><div class="analog-clock" id="clock-tky"><div class="hand hour-hand"></div><div class="hand min-hand"></div><div class="hand sec-hand"></div></div><div class="clock-label" id="lbl-tky">TOKYO</div></div>
-        <div class="clock-item"><div class="analog-clock" id="clock-ldn"><div class="hand hour-hand"></div><div class="hand min-hand"></div><div class="hand sec-hand"></div></div><div class="clock-label" id="lbl-ldn">LONDON</div></div>
-        <div class="clock-item"><div class="analog-clock" id="clock-ny"><div class="hand hour-hand"></div><div class="hand min-hand"></div><div class="hand sec-hand"></div></div><div class="clock-label" id="lbl-ny">NEW YORK</div></div>
+    <div class="master-clock-section">
+        <div style="font-size: 10px; color: #888; margin-bottom: 5px;">MALAYSIA (GMT+8)</div>
+        <div class="analog-master" id="masterClock">
+            <div class="master-hand m-hour"></div><div class="master-hand m-min"></div><div class="master-hand m-sec"></div>
+        </div>
+        <div id="digitalTime" style="font-size: 18px; font-weight: bold; letter-spacing: 2px;">00:00:00</div>
     </div>
 
-    <!-- Analytics Hub -->
+    <div class="session-grid">
+        <div class="glass-item"><div class="glass-tube"><div id="fill-syd" class="sand-fill" style="background:var(--blue)"></div></div><div id="lbl-syd" class="lbl-session">Sydney</div></div>
+        <div class="glass-item"><div class="glass-tube"><div id="fill-tky" class="sand-fill" style="background:var(--gold)"></div></div><div id="lbl-tky" class="lbl-session">Tokyo</div></div>
+        <div class="glass-item"><div class="glass-tube"><div id="fill-ldn" class="sand-fill" style="background:var(--green)"></div></div><div id="lbl-ldn" class="lbl-session">London</div></div>
+        <div class="glass-item"><div class="glass-tube"><div id="fill-ny" class="sand-fill" style="background:var(--red)"></div></div><div id="lbl-ny" class="lbl-session">New York</div></div>
+    </div>
+
+    <!-- Analytics -->
     <div class="app-card">
-        <h2>XPIKOLLAH ANALYSIS HUB</h2>
-        <div class="input-box"><label>Live Price</label><input type="number" id="price" step="0.01"></div>
-        <div class="input-box"><label>Structure</label><select id="maTrend"><option value="up">BULLISH BREAKOUT ↑</option><option value="down">BEARISH BREAKOUT ↓</option></select></div>
-        <div style="display:flex; gap:10px;" class="input-box">
-            <div style="flex:1"><label>Swing High</label><input type="number" id="sh" step="0.01"></div>
-            <div style="flex:1"><label>Swing Low</label><input type="number" id="sl" step="0.01"></div>
-        </div>
+        <input type="number" id="price" placeholder="Live Price">
+        <select id="maTrend"><option value="up">BULLISH ↑</option><option value="down">BEARISH ↓</option></select>
+        <div style="display:flex; gap:10px;"><input type="number" id="sh" placeholder="High" style="flex:1"><input type="number" id="sl" placeholder="Low" style="flex:1"></div>
         <button onclick="analyze()">EXECUTE ANALYTICS</button>
-        
         <div id="resultPanel" class="result-panel">
-            <div class="watch-zone">
-                <div style="font-size: 9px; color: var(--gold); font-weight: bold; margin-bottom: 5px;">REJECTION ZONE (0.5 - 0.2)</div>
-                <div id="resWatchZone" style="font-size: 18px; font-weight: bold;"></div>
-            </div>
             <div class="data-row"><span>BIAS</span><span id="resBias" style="font-weight:bold;"></span></div>
-            <div class="data-row"><span>ENTRY DISYORKAN (0.2)</span><span id="resEntry" style="color:var(--blue); font-weight:bold;"></span></div>
-            <div class="data-row"><span>STOP LOSS (RR 1:2)</span><span id="resSl" style="color:var(--red); font-weight:bold;"></span></div>
-            <div class="data-row"><span>TARGET TP 2</span><span id="resTp" style="color:var(--green); font-weight:bold;"></span></div>
+            <div class="data-row"><span>ENTRY (0.2)</span><span id="resEntry" style="color:var(--blue); font-weight:bold;"></span></div>
+            <div class="data-row"><span>STOP LOSS</span><span id="resSl" style="color:var(--red); font-weight:bold;"></span></div>
+            <div class="data-row"><span>TP 2</span><span id="resTp" style="color:var(--green); font-weight:bold;"></span></div>
         </div>
     </div>
 
-    <!-- Live US News Calendar (Filtered USD Only) -->
-    <div class="news-container">
-        <div class="news-header">🇺🇸 USD HIGH IMPACT NEWS ONLY</div>
-        <iframe src="https://sslecal2.forexprostools.com?columns=exc_curr,exc_importance,exc_actual,exc_prev&features=datepicker,timezone&countries=5&calType=day&timeZone=55&lang=1" width="100%" height="450" frameborder="0" allowtransparency="true" marginwidth="0" marginheight="0"></iframe>
+    <!-- Live USD High/Medium News -->
+    <div class="news-box">
+        <div class="news-header">🇺🇸 USD LIVE NEWS (HIGH & MEDIUM IMPACT)</div>
+        <iframe src="https://sslecal2.forexprostools.com?columns=exc_curr,exc_importance,exc_actual,exc_prev&features=datepicker,timezone&countries=5&calType=day&timeZone=55&lang=1&importance=2,3" width="100%" height="450" frameborder="0" allowtransparency="true"></iframe>
     </div>
 
     <script>
-        // Clock Logic
-        function updateClocks() {
-            const zones = {"clock-my":"Asia/Kuala_Lumpur","clock-syd":"Australia/Sydney","clock-tky":"Asia/Tokyo","clock-ldn":"Europe/London","clock-ny":"America/New_York"};
-            for (const [id, zone] of Object.entries(zones)) {
-                const now = new Date(new Date().toLocaleString("en-US", {timeZone: zone}));
-                const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
-                const clock = document.getElementById(id);
-                clock.querySelector('.hour-hand').style.transform = `translateX(-50%) rotate(${(h%12)*30+m*0.5}deg)`;
-                clock.querySelector('.min-hand').style.transform = `translateX(-50%) rotate(${m*6}deg)`;
-                clock.querySelector('.sec-hand').style.transform = `translateX(-50%) rotate(${s*6}deg)`;
-                if(id!=="clock-my"){
-                    const active = (id==="clock-syd"&&h>=7&&h<16)||(id==="clock-tky"&&h>=9&&h<18)||(id==="clock-ldn"&&h>=8&&h<17)||(id==="clock-ny"&&h>=8&&h<17);
-                    document.getElementById('lbl-'+id.split('-')[1]).className = active ? 'clock-label active' : 'clock-label';
+        function updateEngine() {
+            const now = new Date();
+            const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+            document.getElementById('digitalTime').innerText = now.toLocaleTimeString('en-GB');
+            document.querySelector('.m-hour').style.transform = `translateX(-50%) rotate(${(h%12)*30+m*0.5}deg)`;
+            document.querySelector('.m-min').style.transform = `translateX(-50%) rotate(${m*6}deg)`;
+            document.querySelector('.m-sec').style.transform = `translateX(-50%) rotate(${s*6}deg)`;
+
+            const sessions = [
+                { id: 'syd', start: 6, end: 14, color: 'active-syd' },
+                { id: 'tky', start: 8, end: 17, color: 'active-tky' },
+                { id: 'ldn', start: 15, end: 24, color: 'active-ldn' },
+                { id: 'ny', start: 20, end: 30, color: 'active-ny' }
+            ];
+
+            sessions.forEach(sess => {
+                let currentH = h;
+                if (sess.id === 'ny' && h < 5) currentH = h + 24;
+                const isActive = currentH >= sess.start && currentH < sess.end;
+                const fill = document.getElementById('fill-' + sess.id);
+                const lbl = document.getElementById('lbl-' + sess.id);
+                if (isActive) {
+                    const progress = ((currentH - sess.start) * 3600 + m * 60 + s) / ((sess.end - sess.start) * 3600) * 100;
+                    fill.style.height = (100 - progress) + "%";
+                    lbl.className = 'lbl-session ' + sess.color;
+                } else {
+                    fill.style.height = "0%";
+                    lbl.className = 'lbl-session';
                 }
-            }
+            });
         }
-        setInterval(updateClocks, 1000); updateClocks();
+        setInterval(updateEngine, 1000); updateEngine();
 
-        // Analytics Logic
         function analyze() {
-            const P = parseFloat(document.getElementById('price').value);
-            const SH = parseFloat(document.getElementById('sh').value);
-            const SL = parseFloat(document.getElementById('sl').value);
-            const trend = document.getElementById('maTrend').value;
-            
-            if (isNaN(P)||isNaN(SH)||isNaN(SL)) return alert("Masukkan data harga!");
-            
-            const range = SH - SL;
-            let e02, e05, tp2, isSell = trend === "down";
-
-            if(isSell){
-                e02 = SH - (range * 0.2);
-                e05 = SH - (range * 0.5);
-                tp2 = SH - (range * 1.618);
-            } else {
-                e02 = SL + (range * 0.2);
-                e05 = SL + (range * 0.5);
-                tp2 = SL + (range * 1.618);
-            }
-
-            const riskDist = Math.abs(tp2 - e02) / 2;
-            const slP = isSell ? (e02 + riskDist) : (e02 - riskDist);
-
+            const P = parseFloat(document.getElementById('price').value), SH = parseFloat(document.getElementById('sh').value), SL = parseFloat(document.getElementById('sl').value), trend = document.getElementById('maTrend').value;
+            if (isNaN(P)||isNaN(SH)||isNaN(SL)) return;
+            const range = SH - SL; let e02, tp2, isSell = trend === "down";
+            if(isSell){ e02 = SH-(range*0.2); tp2 = SH-(range*1.618); }
+            else { e02 = SL+(range*0.2); tp2 = SL+(range*1.618); }
+            const slP = isSell ? (e02 + Math.abs(tp2-e02)/2) : (e02 - Math.abs(tp2-e02)/2);
             document.getElementById('resEntry').innerText = e02.toFixed(2);
-            document.getElementById('resWatchZone').innerText = isSell ? e02.toFixed(2)+" - "+e05.toFixed(2) : e05.toFixed(2)+" - "+e02.toFixed(2);
             document.getElementById('resSl').innerText = slP.toFixed(2);
             document.getElementById('resTp').innerText = tp2.toFixed(2);
-            document.getElementById('resBias').innerText = isSell ? "BEARISH SELL" : "BULLISH BUY";
+            document.getElementById('resBias').innerText = isSell ? "SELL" : "BUY";
             document.getElementById('resBias').style.color = isSell ? "var(--red)" : "var(--green)";
-            
             document.getElementById('resultPanel').style.display = 'block';
         }
     </script>

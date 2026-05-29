@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XPIKOLLAH ELITE HUB V4</title>
+    <title>XPIKOLLAH ELITE HUB V4 - COUNTDOWN</title>
     <style>
         :root { --gold: #f1c40f; --blue: #00d2ff; --red: #ff4444; --green: #00ff88; --bg: #0a0a0a; }
         body { 
@@ -35,21 +35,21 @@
             display: flex; flex-direction: column; align-items: center;
         }
         
-        /* Glass Tube dengan 4 Blok Separuh */
+        /* Glass Tube Countdown */
         .glass-tube {
-            width: 16px; height: 70px; 
-            display: flex; flex-direction: column-reverse; /* Biar blok menyala dari bawah */
-            gap: 2px; /* Jarak antara blok */
+            width: 18px; height: 70px; 
+            display: flex; flex-direction: column; /* Countdown dari atas ke bawah */
+            gap: 3px; 
             margin-bottom: 8px;
         }
         .block {
-            flex: 1; background: #222; border-radius: 2px;
-            transition: background 0.5s ease;
+            flex: 1; background: #222; border-radius: 3px;
+            transition: background 0.3s ease;
         }
 
-        .lbl-session { font-size: 8px; font-weight: bold; color: #555; text-transform: uppercase; }
+        .lbl-session { font-size: 8px; font-weight: bold; color: #555; text-transform: uppercase; margin-top: 4px; }
         
-        /* Active Colors untuk Label */
+        /* Active Colors */
         .active-syd { color: var(--blue) !important; }
         .active-tky { color: var(--gold) !important; }
         .active-ldn { color: var(--green) !important; }
@@ -66,7 +66,6 @@
         .result-panel { margin-top: 15px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 20px; display: none; }
         .data-row { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 1px solid #222; }
 
-        /* --- Live News Container --- */
         .news-box {
             width: 100%; max-width: 420px; background: #1a1a1a; border-radius: 24px; 
             overflow: hidden; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -85,7 +84,6 @@
     </div>
 
     <div class="session-grid">
-        <!-- Struktur 4 Blok untuk setiap sesi -->
         <div class="glass-item">
             <div class="glass-tube" id="tube-syd">
                 <div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div>
@@ -112,6 +110,7 @@
         </div>
     </div>
 
+    <!-- Analytics & News tetap sama -->
     <div class="app-card">
         <input type="number" id="price" placeholder="Live Price">
         <select id="maTrend"><option value="up">BULLISH ↑</option><option value="down">BEARISH ↓</option></select>
@@ -126,7 +125,7 @@
     </div>
 
     <div class="news-box">
-        <div class="news-header">🇺🇸 USD LIVE NEWS (HIGH & MEDIUM IMPACT)</div>
+        <div class="news-header">🇺🇸 USD LIVE NEWS</div>
         <iframe src="https://sslecal2.forexprostools.com?columns=exc_curr,exc_importance,exc_actual,exc_prev&features=datepicker,timezone&countries=5&calType=day&timeZone=55&lang=1&importance=2,3" width="100%" height="450" frameborder="0" allowtransparency="true"></iframe>
     </div>
 
@@ -151,23 +150,28 @@
                 if (sess.id === 'ny' && h < 5) currentH = h + 24;
                 const isActive = currentH >= sess.start && currentH < sess.end;
                 const tube = document.getElementById('tube-' + sess.id);
-                const blocks = tube.getElementsByClassName('block');
+                const blocks = tube.getElementsByClassName('block'); // Index 0 (Top) to 3 (Bottom)
                 const lbl = document.getElementById('lbl-' + sess.id);
 
                 if (isActive) {
                     const totalSec = (sess.end - sess.start) * 3600;
                     const elapsedSec = (currentH - sess.start) * 3600 + m * 60 + s;
-                    const progress = (elapsedSec / totalSec) * 100;
+                    const remainingProgress = ((totalSec - elapsedSec) / totalSec) * 100;
                     
                     lbl.className = 'lbl-session ' + sess.cls;
 
-                    // Nyalakan blok berdasarkan progress (setiap blok = 25%)
+                    // Countdown Logic: Blok padam dari atas ke bawah
                     for (let i = 0; i < 4; i++) {
-                        if (progress >= (i + 1) * 25) {
+                        // Terbalikkan i untuk semak dari bawah (3, 2, 1, 0)
+                        let blockThreshold = (3 - i + 1) * 25; 
+                        let lowerThreshold = (3 - i) * 25;
+
+                        if (remainingProgress >= blockThreshold) {
                             blocks[i].style.background = sess.color;
-                        } else if (progress > i * 25) {
-                            // Blok yang sedang berjalan (separa nyala)
-                            blocks[i].style.background = `linear-gradient(to top, ${sess.color} ${((progress % 25) / 25) * 100}%, #222 0%)`;
+                        } else if (remainingProgress > lowerThreshold) {
+                            // Blok sedang menyusut
+                            let subProgress = ((remainingProgress - lowerThreshold) / 25) * 100;
+                            blocks[i].style.background = `linear-gradient(to top, ${sess.color} ${subProgress}%, #222 0%)`;
                         } else {
                             blocks[i].style.background = '#222';
                         }

@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>XPIKOLLAH ELITE HUB V4 - LEVERAGE PRO</title>
-    <!-- Tambah Library Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --gold: #f1c40f; --blue: #00d2ff; --red: #ff4444; --green: #00ff88; --bg: #0a0a0a; }
@@ -33,9 +32,11 @@
         .data-row { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 1px solid #222; }
         .risk-warning { color: var(--red); font-size: 11px; text-align: center; margin-top: 10px; font-weight: bold; }
         
-        /* New Analytics Styling */
-        .analytics-card { background: #141414; border: 1px solid #333; border-radius: 28px; width: 100%; max-width: 420px; padding: 20px; margin-bottom: 15px; }
-        .chart-container { position: relative; height: 200px; width: 100%; margin-top: 10px; }
+        /* Analytics & Journal Styling */
+        .analytics-card { background: #141414; border: 1px solid #333; border-radius: 28px; width: 100%; max-width: 420px; padding: 20px; margin-bottom: 15px; box-sizing: border-box; }
+        .chart-container { position: relative; height: 180px; width: 100%; margin-top: 10px; }
+        .journal-input { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 20px; border: 1px dashed #444; margin-top: 15px; }
+        .btn-small { padding: 8px; font-size: 11px; background: #333; color: var(--gold); margin-top: 5px; border-radius: 8px; }
         .news-box { width: 100%; max-width: 420px; background: #1a1a1a; border-radius: 24px; overflow: hidden; border: 1px solid #333; margin-top: 15px; }
         .news-ticker { background: #222; color: var(--gold); padding: 10px; text-align: center; font-size: 11px; font-weight: bold; border-bottom: 1px solid #333; }
     </style>
@@ -79,16 +80,23 @@
         </div>
     </div>
 
-    <!-- Analytics Section -->
     <div class="analytics-card">
         <div style="font-size: 12px; font-weight: bold; color: var(--gold); text-align: center; margin-bottom: 10px;">TRADING PERFORMANCE ANALYTICS</div>
-        <div class="chart-container">
-            <canvas id="performanceChart"></canvas>
-        </div>
-        <div id="statsRow" style="display: flex; justify-content: space-around; margin-top: 15px; font-size: 12px;">
+        <div class="chart-container"><canvas id="performanceChart"></canvas></div>
+        <div id="statsRow" style="display: flex; justify-content: space-around; margin-top: 15px; font-size: 11px;">
             <div style="text-align:center;"><span style="color:var(--green);" id="winCount">0</span><br>WINS</div>
             <div style="text-align:center;"><span style="color:var(--red);" id="lossCount">0</span><br>LOSSES</div>
-            <div style="text-align:center;"><span style="color:var(--gold);" id="winRate">0%</span><br>WIN RATE</div>
+            <div style="text-align:center;"><span style="color:var(--gold);" id="winRate">0%</span><br>WR</div>
+        </div>
+
+        <div class="journal-input">
+            <div style="font-size: 10px; color: #888; margin-bottom: 8px; text-align: center;">QUICK ADD TO JOURNAL</div>
+            <div class="input-group">
+                <input type="text" id="jPair" placeholder="Pair" style="font-size: 11px; padding: 8px;">
+                <select id="jResult" style="font-size: 11px; padding: 8px;"><option value="Win">WIN</option><option value="Loss">LOSS</option></select>
+            </div>
+            <button onclick="addToJournal()" style="padding: 10px; font-size: 12px;">ADD TO JOURNAL</button>
+            <button onclick="clearJournal()" class="btn-small" style="width:100%; background:transparent; border:1px solid #333;">RESET LOCAL DATA</button>
         </div>
     </div>
 
@@ -98,7 +106,8 @@
     </div>
 
     <script>
-        // Existing Clock Engine
+        let myChart;
+
         function updateEngine() {
             const now = new Date(), h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
             document.getElementById('digitalTime').innerText = now.toLocaleTimeString('en-GB');
@@ -123,7 +132,6 @@
         }
         setInterval(updateEngine, 1000); updateEngine();
 
-        // Existing Analyzer
         function analyze() {
             const bal = parseFloat(document.getElementById('balance').value), risk = parseFloat(document.getElementById('riskPerc').value), lev = parseFloat(document.getElementById('lev').value), P = parseFloat(document.getElementById('price').value), SH = parseFloat(document.getElementById('sh').value), SL = parseFloat(document.getElementById('sl').value), trend = document.getElementById('maTrend').value;
             if(isNaN(P)||isNaN(bal)) return;
@@ -146,43 +154,57 @@
             document.getElementById('resultPanel').style.display = 'block';
         }
 
-        // New Performance Analytics Logic
         async function loadAnalytics() {
+            let githubData = [];
             try {
                 const response = await fetch('trades.json');
-                const data = await response.json();
-                
-                const wins = data.filter(t => t.result === 'Win').length;
-                const losses = data.filter(t => t.result === 'Loss').length;
-                const wr = ((wins / data.length) * 100).toFixed(1);
+                githubData = await response.json();
+            } catch (e) { console.log("JSON not found, using local only."); }
 
-                document.getElementById('winCount').innerText = wins;
-                document.getElementById('lossCount').innerText = losses;
-                document.getElementById('winRate').innerText = wr + "%";
+            const localData = JSON.parse(localStorage.getItem('myTrades') || '[]');
+            const allData = [...githubData, ...localData];
+            
+            const wins = allData.filter(t => t.result === 'Win').length;
+            const losses = allData.filter(t => t.result === 'Loss').length;
+            const wr = allData.length > 0 ? ((wins / allData.length) * 100).toFixed(1) : 0;
 
-                const ctx = document.getElementById('performanceChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Wins', 'Losses'],
-                        datasets: [{
-                            data: [wins, losses],
-                            backgroundColor: ['#00ff88', '#ff4444'],
-                            borderWidth: 0,
-                            hoverOffset: 10
-                        }]
-                    },
-                    options: {
-                        cutout: '70%',
-                        plugins: {
-                            legend: { display: false }
-                        }
-                    }
-                });
-            } catch (e) {
-                console.log("Waiting for trades.json data...");
+            document.getElementById('winCount').innerText = wins;
+            document.getElementById('lossCount').innerText = losses;
+            document.getElementById('winRate').innerText = wr + "%";
+
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            if(myChart) myChart.destroy();
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Wins', 'Losses'],
+                    datasets: [{
+                        data: [wins, losses],
+                        backgroundColor: ['#00ff88', '#ff4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: { cutout: '75%', plugins: { legend: { display: false } } }
+            });
+        }
+
+        function addToJournal() {
+            const pair = document.getElementById('jPair').value || 'NA';
+            const result = document.getElementById('jResult').value;
+            const localData = JSON.parse(localStorage.getItem('myTrades') || '[]');
+            localData.push({ pair, result, date: new Date().toISOString() });
+            localStorage.setItem('myTrades', JSON.stringify(localData));
+            loadAnalytics();
+            alert("Trade Saved Local!");
+        }
+
+        function clearJournal() {
+            if(confirm("Clear local trades?")) {
+                localStorage.removeItem('myTrades');
+                loadAnalytics();
             }
         }
+        
         loadAnalytics();
     </script>
 </body>

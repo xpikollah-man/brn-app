@@ -3,251 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XPIKOLLAH ELITE HUB V4 - LEVERAGE PRO</title>
+    <title>XPIKOLLAH ELITE HUB V4 - POWER BI EDITION</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --gold: #f1c40f; --blue: #00d2ff; --red: #ff4444; --green: #00ff88; --bg: #0a0a0a; }
-        body { background-color: var(--bg); color: #e0e0e0; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 10px; margin: 0; }
-        .master-clock-section { background: rgba(255,255,255,0.03); width: 100%; max-width: 420px; padding: 20px; border-radius: 28px; border: 1px solid #222; margin-bottom: 15px; display: flex; flex-direction: column; align-items: center; position: relative; }
-        .overlap-badge { position: absolute; top: 15px; right: 25px; display: flex; flex-direction: column; align-items: center; opacity: 0.1; transition: all 0.5s ease; }
-        .overlap-active { opacity: 1; filter: drop-shadow(0 0 12px var(--gold)); transform: scale(1.1); }
-        .overlap-icon { font-size: 28px; }
-        .overlap-text { font-size: 8px; font-weight: bold; color: var(--gold); margin-top: 2px; }
-        .analog-master { width: 80px; height: 80px; border: 3px solid #333; border-radius: 50%; position: relative; background: #111; margin-bottom: 10px; }
-        .master-hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom; background: #fff; border-radius: 10px; }
-        .m-hour { width: 3px; height: 25px; z-index: 3; }
-        .m-min { width: 2px; height: 35px; z-index: 2; }
-        .m-sec { width: 1px; height: 38px; z-index: 1; background: var(--gold); }
-        .session-grid { display: grid; grid-template-columns: repeat(4, 1fr); width: 100%; max-width: 420px; gap: 10px; margin-bottom: 15px; }
-        .glass-item { background: #151515; padding: 15px 5px; border-radius: 15px; border: 1px solid #222; display: flex; flex-direction: column; align-items: center; }
-        .glass-tube { width: 18px; height: 70px; display: flex; flex-direction: column; gap: 3px; margin-bottom: 8px; }
-        .block { flex: 1; background: #222; border-radius: 3px; }
-        .lbl-session { font-size: 8px; font-weight: bold; color: #444; text-transform: uppercase; }
-        .active-syd { color: var(--blue) !important; } .active-tky { color: var(--gold) !important; } .active-ldn { color: var(--green) !important; } .active-ny { color: var(--red) !important; }
-        .app-card { background: #141414; border: 1px solid #333; border-radius: 28px; width: 100%; max-width: 420px; padding: 25px; box-sizing: border-box; margin-bottom: 15px; }
-        .input-group { display: flex; gap: 10px; margin-bottom: 10px; }
-        input, select, textarea { width: 100%; padding: 12px; background: #000; border: 1px solid #333; border-radius: 12px; color: white; margin-bottom: 10px; font-size: 13px; outline: none; font-family: inherit; }
-        button { width: 100%; padding: 15px; background: var(--gold); color: #000; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; }
-        .result-panel { margin-top: 15px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 20px; display: none; }
-        .data-row { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 1px solid #222; }
-        .risk-warning { color: var(--red); font-size: 11px; text-align: center; margin-top: 10px; font-weight: bold; }
+        :root { --gold: #f1c40f; --blue: #3498db; --red: #e74c3c; --green: #2ecc71; --bg: #0d1117; --card: #161b22; --text: #c9d1d9; }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 10px; margin: 0; }
         
-        .analytics-card { background: #141414; border: 1px solid #333; border-radius: 28px; width: 100%; max-width: 420px; padding: 20px; margin-bottom: 15px; box-sizing: border-box; }
-        .chart-container { position: relative; height: 160px; width: 100%; margin-top: 10px; }
-        .journal-form { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 20px; border: 1px dashed #444; margin-top: 15px; }
-        .journal-list { margin-top: 15px; width: 100%; max-height: 200px; overflow-y: auto; }
-        .history-item { font-size: 10px; background: #111; padding: 10px; border-radius: 10px; border-left: 3px solid var(--gold); margin-bottom: 8px; }
-        .btn-copy { background: #0078d4; color: white; font-size: 11px; padding: 10px; border-radius: 8px; margin-top: 10px; width: 100%; border: none; font-weight: bold; }
-        .news-box { width: 100%; max-width: 420px; background: #1a1a1a; border-radius: 24px; overflow: hidden; border: 1px solid #333; margin-top: 15px; }
-        .news-ticker { background: #222; color: var(--gold); padding: 10px; text-align: center; font-size: 11px; font-weight: bold; border-bottom: 1px solid #333; }
+        /* Dashboard Stats - Power BI Style */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 420px; margin-bottom: 15px; }
+        .stat-card { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #30363d; text-align: center; }
+        .stat-val { font-size: 18px; font-weight: bold; display: block; margin-top: 5px; }
+        .stat-lbl { font-size: 10px; color: #8b949e; text-transform: uppercase; }
+
+        .app-card, .analytics-card { background: var(--card); border: 1px solid #30363d; border-radius: 16px; width: 100%; max-width: 420px; padding: 20px; box-sizing: border-box; margin-bottom: 15px; }
+        
+        /* Clock & Sessions */
+        .master-clock-section { background: var(--card); width: 100%; max-width: 420px; padding: 15px; border-radius: 16px; border: 1px solid #30363d; margin-bottom: 15px; display: flex; justify-content: space-around; align-items: center; }
+        .digital-time { font-size: 20px; font-weight: bold; color: var(--gold); }
+        
+        /* Inputs & Buttons */
+        .input-group { display: flex; gap: 8px; margin-bottom: 8px; }
+        input, select, textarea { width: 100%; padding: 10px; background: #010409; border: 1px solid #30363d; border-radius: 8px; color: white; font-size: 12px; outline: none; }
+        button { width: 100%; padding: 12px; background: var(--gold); color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        
+        /* Journal History List */
+        .history-list { margin-top: 15px; max-height: 250px; overflow-y: auto; }
+        .history-item { background: #0d1117; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #333; font-size: 11px; }
+        .item-win { border-left-color: var(--green); }
+        .item-loss { border-left-color: var(--red); }
+        
+        .chart-container { position: relative; height: 150px; margin: 10px 0; }
+        .copy-btn { background: var(--blue); color: white; font-size: 11px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
+    <!-- DIGITAL HEADER -->
     <div class="master-clock-section">
-        <div id="overlapBulb" class="overlap-badge"><span class="overlap-icon">💡</span><span id="overlapText" class="overlap-text">NO OVERLAP</span></div>
-        <div style="font-size: 10px; color: #888; margin-bottom: 5px;">MALAYSIA (GMT+8)</div>
-        <div class="analog-master"><div class="master-hand m-hour"></div><div class="master-hand m-min"></div><div class="master-hand m-sec"></div></div>
-        <div id="digitalTime" style="font-size: 18px; font-weight: bold; letter-spacing: 2px;">00:00:00</div>
+        <div class="digital-time" id="digitalTime">00:00:00</div>
+        <div style="font-size: 10px; text-align: right;">
+            <span id="overlapText" style="color:var(--gold)">NO OVERLAP</span><br>
+            <span style="color:#8b949e">MYSTERY HUB V4</span>
+        </div>
     </div>
 
-    <div class="session-grid">
-        <div class="glass-item"><div class="glass-tube" id="tube-syd"><div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div></div><div id="lbl-syd" class="lbl-session">Sydney</div></div>
-        <div class="glass-item"><div class="glass-tube" id="tube-tky"><div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div></div><div id="lbl-tky" class="lbl-session">Tokyo</div></div>
-        <div class="glass-item"><div class="glass-tube" id="tube-ldn"><div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div></div><div id="lbl-ldn" class="lbl-session">London</div></div>
-        <div class="glass-item"><div class="glass-tube" id="tube-ny"><div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div></div><div id="lbl-ny" class="lbl-session">New York</div></div>
-    </div>
-
+    <!-- CALCULATOR -->
     <div class="app-card">
+        <div style="font-size: 12px; font-weight: bold; margin-bottom: 12px; color: var(--gold);">⚡ TRADE EXECUTION PLAN</div>
         <div class="input-group">
-            <input type="number" id="balance" placeholder="Bal ($)">
-            <input type="number" id="riskPerc" placeholder="Risk %" value="10">
-            <select id="lev"><option value="500">1:500</option><option value="1000">1:1000</option><option value="2000">1:2000</option><option value="30">1:30</option></select>
+            <input type="number" id="balance" placeholder="Balance ($)">
+            <input type="number" id="riskPerc" placeholder="Risk %" value="1">
         </div>
-        <input type="number" id="price" placeholder="Current Price">
         <div class="input-group">
-            <input type="number" id="sh" placeholder="High"><input type="number" id="sl" placeholder="Low">
+            <input type="number" id="sh" placeholder="High (SH)">
+            <input type="number" id="sl" placeholder="Low (SL)">
         </div>
-        <select id="maTrend"><option value="up">BULLISH ↑</option><option value="down">BEARISH ↓</option></select>
-        <button onclick="analyze()">EXECUTE TRADE PLAN</button>
-
-        <div id="resultPanel" class="result-panel">
-            <div class="data-row"><span>BIAS / ENTRY</span><span id="resEntry" style="font-weight:bold;"></span></div>
-            <div class="data-row"><span>STOP LOSS / TP</span><span id="resSlTp" style="font-size:11px;"></span></div>
-            <hr style="border:0; border-top:1px solid #333;">
-            <div class="data-row" style="color:var(--gold);"><span>RECOMMENDED LOT</span><span id="resLot" style="font-weight:bold;"></span></div>
-            <div class="data-row"><span>EST. MARGIN REQ.</span><span id="resMargin"></span></div>
-            <div id="mcWarning" class="risk-warning"></div>
+        <select id="maTrend"><option value="up">BULLISH TREND ↑</option><option value="down">BEARISH TREND ↓</option></select>
+        <button onclick="analyze()">CALCULATE POSITION</button>
+        <div id="resultPanel" style="display:none; margin-top:10px; font-size:12px; background:#0d1117; padding:10px; border-radius:8px;">
+            <div id="resEntry"></div>
+            <div id="resLot" style="color:var(--gold); font-weight:bold; margin-top:5px;"></div>
         </div>
     </div>
 
+    <!-- DASHBOARD STATS (POWER BI LOOK) -->
+    <div class="stats-grid">
+        <div class="stat-card"><span class="stat-lbl">Win Rate</span><span class="stat-val" id="winRate" style="color:var(--gold);">0%</span></div>
+        <div class="stat-card"><span class="stat-lbl">Total Trades</span><span class="stat-val" id="totalTrades">0</span></div>
+        <div class="stat-card"><span class="stat-lbl">Wins</span><span class="stat-val" id="winCount" style="color:var(--green);">0</span></div>
+        <div class="stat-card"><span class="stat-lbl">Losses</span><span class="stat-val" id="lossCount" style="color:var(--red);">0</span></div>
+    </div>
+
+    <!-- ANALYTICS & JOURNAL -->
     <div class="analytics-card">
-        <div style="font-size: 12px; font-weight: bold; color: var(--gold); text-align: center; margin-bottom: 10px;">ELITE TRADING JOURNAL</div>
+        <div style="font-size: 12px; font-weight: bold; margin-bottom: 10px; color: var(--gold);">📊 PERFORMANCE ANALYSIS</div>
         <div class="chart-container"><canvas id="performanceChart"></canvas></div>
-        <div id="statsRow" style="display: flex; justify-content: space-around; margin-top: 15px; font-size: 11px;">
-            <div style="text-align:center;"><span style="color:var(--green);" id="winCount">0</span><br>WINS</div>
-            <div style="text-align:center;"><span style="color:var(--red);" id="lossCount">0</span><br>LOSSES</div>
-            <div style="text-align:center;"><span style="color:var(--gold);" id="winRate">0%</span><br>WR</div>
+        
+        <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; margin-top: 10px;">
+            <div style="font-size: 11px; margin-bottom: 10px; font-weight: bold;">LOG NEW TRADE</div>
+            <div class="input-group">
+                <input type="text" id="jPair" placeholder="Pair (e.g. GOLD)">
+                <select id="jResult"><option value="Win">WIN</option><option value="Loss">LOSS</option></select>
+            </div>
+            <textarea id="jReason" placeholder="Reason for Entry..." rows="2"></textarea>
+            <button onclick="addToJournal()">SAVE TO JOURNAL</button>
         </div>
 
-        <div class="journal-form">
-            <div style="font-size: 10px; color: var(--gold); text-align: center; margin-bottom: 10px; font-weight:bold;">ADD TRADE RECORD</div>
-            <div class="input-group">
-                <input type="text" id="jPair" placeholder="XAUUSD">
-                <select id="jType"><option value="Buy">BUY</option><option value="Sell">SELL</option></select>
-            </div>
-            <div class="input-group">
-                <input type="number" id="jEntry" placeholder="Entry Price">
-                <input type="number" id="jRisk" placeholder="Risk %" value="1">
-            </div>
-            <div class="input-group">
-                <input type="number" id="jSl" placeholder="SL">
-                <input type="number" id="jTp" placeholder="TP">
-            </div>
-            <textarea id="jReason" placeholder="Reason (e.g. Reject SnR H4)" rows="2"></textarea>
-            <select id="jResult">
-                <option value="Win">✅ HIT TAKE PROFIT (WIN)</option>
-                <option value="Loss">❌ HIT STOP LOSS (LOSS)</option>
-            </select>
-            <button onclick="addToJournal()" style="padding: 10px; font-size: 12px; margin-top: 5px;">SAVE TO JOURNAL</button>
-        </div>
-        
-        <div id="historyList" class="journal-list"></div>
-        
-        <button onclick="copyForPowerBI()" class="btn-copy">📋 COPY ALL DATA FOR POWER BI</button>
-        <button onclick="clearJournal()" style="background:transparent; border:1px solid #333; color:#666; font-size:10px; padding:5px; margin-top:10px; width:100%;">RESET ALL HISTORY</button>
-    </div>
-
-    <div class="news-box">
-        <div class="news-ticker">⚠️ MONITOR NEWS IMPACT</div>
-        <iframe src="https://sslecal2.forexprostools.com?columns=exc_curr,exc_importance,exc_actual,exc_prev&features=datepicker,timezone&countries=5&calType=day&timeZone=55&lang=1&importance=2,3" width="100%" height="300" frameborder="0" allowtransparency="true"></iframe>
+        <div id="historyList" class="history-list"></div>
+        <button onclick="copyForPowerBI()" class="copy-btn">📋 COPY DATA FOR POWER BI</button>
+        <button onclick="clearJournal()" style="background:transparent; color:#555; font-size:10px; margin-top:10px; border:none;">Reset History</button>
     </div>
 
     <script>
         let myChart;
-        function updateEngine() {
-            const now = new Date(), h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
-            document.getElementById('digitalTime').innerText = now.toLocaleTimeString('en-GB');
-            document.querySelector('.m-hour').style.transform = `translateX(-50%) rotate(${(h%12)*30+m*0.5}deg)`;
-            document.querySelector('.m-min').style.transform = `translateX(-50%) rotate(${m*6}deg)`;
-            document.querySelector('.m-sec').style.transform = `translateX(-50%) rotate(${s*6}deg)`;
-            const sessions = [ { id:'syd',s:6,e:14,c:'var(--blue)',cl:'active-syd' }, { id:'tky',s:8,e:17,c:'var(--gold)',cl:'active-tky' }, { id:'ldn',s:15,e:24,c:'var(--green)',cl:'active-ldn' }, { id:'ny',s:20,e:30,c:'var(--red)',cl:'active-ny' } ];
-            let activeCount = 0;
-            sessions.forEach(sess => {
-                let curH = h; if(sess.id==='ny' && h<6) curH=h+24;
-                const active = curH >= sess.s && curH < sess.e;
-                const blocks = document.getElementById('tube-'+sess.id).getElementsByClassName('block');
-                const lbl = document.getElementById('lbl-'+sess.id);
-                if(active){ activeCount++; lbl.className='lbl-session '+sess.cl;
-                    const rem = (((sess.e-curH)*3600)-(m*60)-s)/((sess.e-sess.s)*3600)*100;
-                    for(let i=0;i<4;i++){ let t=(4-i)*25, b=(3-i)*25; if(rem>=t) blocks[i].style.background=sess.c; else if(rem>b) blocks[i].style.background=`linear-gradient(to top, ${sess.c} ${((rem-b)/25)*100}%, #222 0%)`; else blocks[i].style.background='#222'; }
-                } else { lbl.className='lbl-session'; for(let b of blocks) b.style.background='#222'; }
-            });
-            const bulb = document.getElementById('overlapBulb');
-            if(activeCount>1){ bulb.classList.add('overlap-active'); document.getElementById('overlapText').innerText="IDEA OVERLAP"; }
-            else { bulb.classList.remove('overlap-active'); document.getElementById('overlapText').innerText="NO OVERLAP"; }
+        function updateClock() {
+            document.getElementById('digitalTime').innerText = new Date().toLocaleTimeString('en-GB');
         }
-        setInterval(updateEngine, 1000); updateEngine();
+        setInterval(updateClock, 1000);
 
         function analyze() {
-            const bal = parseFloat(document.getElementById('balance').value), risk = parseFloat(document.getElementById('riskPerc').value), lev = parseFloat(document.getElementById('lev').value), P = parseFloat(document.getElementById('price').value), SH = parseFloat(document.getElementById('sh').value), SL = parseFloat(document.getElementById('sl').value), trend = document.getElementById('maTrend').value;
-            if(isNaN(P)||isNaN(bal)) return;
-            const range = SH-SL; let entry, tp, slVal, isSell = trend === "down";
-            if(isSell){ entry=SH-(range*0.2); tp=SH-(range*1.618); slVal=entry+(Math.abs(tp-entry)*0.5); }
-            else { entry=SL+(range*0.2); tp=SL+(range*1.618); slVal=entry-(Math.abs(tp-entry)*0.5); }
-            const pipsRisk = Math.abs(entry-slVal)*100;
-            const amountAtRisk = bal*(risk/100);
-            let lot = (amountAtRisk/(pipsRisk*10)).toFixed(2);
-            if(lot < 0.01) lot = 0.01;
-            const marginReq = (P * lot * 100000 / lev) / 100; 
-            document.getElementById('resEntry').innerText = (isSell?"SELL @ ":"BUY @ ") + entry.toFixed(2);
-            document.getElementById('resSlTp').innerText = "SL: "+slVal.toFixed(2)+" | TP: "+tp.toFixed(2);
-            document.getElementById('resLot').innerText = lot;
-            document.getElementById('resMargin').innerText = "$"+marginReq.toFixed(2);
-            const warn = document.getElementById('mcWarning');
-            if(marginReq > bal) { warn.innerText = "❌ INSUFFICIENT MARGIN! REDUCE LOT"; warn.style.color="var(--red)"; }
-            else if(amountAtRisk > (bal*0.2)) { warn.innerText = "⚠️ HIGH RISK ALERT!"; warn.style.color="var(--red)"; }
-            else { warn.innerText = "✅ PLAN VALIDATED"; warn.style.color="var(--green)"; }
+            const bal = parseFloat(document.getElementById('balance').value), risk = parseFloat(document.getElementById('riskPerc').value), SH = parseFloat(document.getElementById('sh').value), SL = parseFloat(document.getElementById('sl').value), trend = document.getElementById('maTrend').value;
+            if(!bal || !SH) return;
+            const range = SH-SL; let entry = trend === "up" ? SL+(range*0.2) : SH-(range*0.2);
+            document.getElementById('resEntry').innerText = "Entry: " + entry.toFixed(2);
+            document.getElementById('resLot').innerText = "Rec. Lot: " + (bal*risk/10000).toFixed(2);
             document.getElementById('resultPanel').style.display = 'block';
         }
 
         async function loadAnalytics() {
-            let githubData = [];
-            try { const res = await fetch('trades.json'); githubData = await res.json(); } catch(e){}
             const localData = JSON.parse(localStorage.getItem('myEliteTrades') || '[]');
-            const allData = [...githubData, ...localData];
+            const wins = localData.filter(t => t.result === 'Win').length;
+            const losses = localData.filter(t => t.result === 'Loss').length;
             
-            const wins = allData.filter(t => t.result === 'Win').length;
-            const losses = allData.filter(t => t.result === 'Loss').length;
-            const wr = allData.length > 0 ? ((wins / allData.length) * 100).toFixed(1) : 0;
-
             document.getElementById('winCount').innerText = wins;
             document.getElementById('lossCount').innerText = losses;
-            document.getElementById('winRate').innerText = wr + "%";
+            document.getElementById('totalTrades').innerText = localData.length;
+            document.getElementById('winRate').innerText = localData.length ? ((wins/localData.length)*100).toFixed(1) + "%" : "0%";
 
             const ctx = document.getElementById('performanceChart').getContext('2d');
             if(myChart) myChart.destroy();
             myChart = new Chart(ctx, {
                 type: 'doughnut',
-                data: { labels: ['Wins', 'Losses'], datasets: [{ data:[wins, losses], backgroundColor:['#00ff88','#ff4444'], borderWidth:0 }] },
-                options: { cutout:'75%', plugins:{ legend:{display:false} } }
+                data: { labels: ['Win', 'Loss'], datasets: [{ data: [wins, losses], backgroundColor: ['#2ecc71', '#e74c3c'], borderWidth: 0 }] },
+                options: { cutout: '80%', plugins: { legend: { display: false } } }
             });
 
-            const hist = document.getElementById('historyList');
-            hist.innerHTML = localData.slice().reverse().map(t => `
-                <div class="history-item">
-                    <b>${t.type} ${t.pair}</b> | RR: ${t.rr} | Result: ${t.result}<br>
-                    <span style="color:#888">E: ${t.entry} | SL: ${t.sl} | TP: ${t.tp}</span><br>
-                    <span style="color:var(--gold)">Reason: ${t.reason}</span>
+            document.getElementById('historyList').innerHTML = localData.slice().reverse().map(t => `
+                <div class="history-item ${t.result === 'Win' ? 'item-win' : 'item-loss'}">
+                    <div style="display:flex; justify-content:space-between;"><b>${t.pair}</b> <span>${t.result}</span></div>
+                    <div style="color:#8b949e; margin-top:5px;">${t.reason}</div>
+                    <div style="font-size:9px; color:#555; margin-top:5px;">${t.date}</div>
                 </div>
             `).join('');
         }
 
         function addToJournal() {
             const pair = document.getElementById('jPair').value || 'NA';
-            const type = document.getElementById('jType').value;
-            const entry = parseFloat(document.getElementById('jEntry').value) || 0;
-            const sl = parseFloat(document.getElementById('jSl').value) || 0;
-            const tp = parseFloat(document.getElementById('jTp').value) || 0;
-            const risk = document.getElementById('jRisk').value;
-            const reason = document.getElementById('jReason').value || 'No reason';
             const result = document.getElementById('jResult').value;
-
-            const riskAmt = Math.abs(entry - sl);
-            const rewardAmt = Math.abs(tp - entry);
-            const rr = riskAmt > 0 ? (rewardAmt / riskAmt).toFixed(1) : 0;
-
-            const localData = JSON.parse(localStorage.getItem('myEliteTrades') || '[]');
-            localData.push({ 
-                date: new Date().toLocaleDateString(), 
-                pair, type, entry, sl, tp, risk, reason, result, rr: `1:${rr}` 
-            });
-            localStorage.setItem('myEliteTrades', JSON.stringify(localData));
-            loadAnalytics();
-            alert("Journal Updated!");
-        }
-
-        function copyForPowerBI() {
-            const localData = JSON.parse(localStorage.getItem('myEliteTrades') || '[]');
-            if(localData.length === 0) { alert("No data to copy!"); return; }
-            
-            // Header CSV
-            let csv = "Date,Pair,Type,Entry,SL,TP,RiskPerc,Result,RR,Reason\n";
-            
-            // Data Rows
-            localData.forEach(t => {
-                csv += `${t.date},${t.pair},${t.type},${t.entry},${t.sl},${t.tp},${t.risk},${t.result},${t.rr},"${t.reason}"\n`;
-            });
-
-            navigator.clipboard.writeText(csv).then(() => {
-                alert("Data copied in CSV format! You can now paste it into Excel or Power BI.");
-            });
-        }
-
-        function clearJournal() {
-            if(confirm("Reset all history?")) { localStorage.removeItem('myEliteTrades'); loadAnalytics(); }
-        }
-        loadAnalytics();
-    </script>
-</body>
-</html>
+ 

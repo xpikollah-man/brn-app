@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>XPIKOLLAH ELITE HUB V4 - LEVERAGE PRO</title>
+    <!-- Tambah Library Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --gold: #f1c40f; --blue: #00d2ff; --red: #ff4444; --green: #00ff88; --bg: #0a0a0a; }
         body { background-color: var(--bg); color: #e0e0e0; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 10px; margin: 0; }
@@ -30,7 +32,11 @@
         .result-panel { margin-top: 15px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 20px; display: none; }
         .data-row { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 1px solid #222; }
         .risk-warning { color: var(--red); font-size: 11px; text-align: center; margin-top: 10px; font-weight: bold; }
-        .news-box { width: 100%; max-width: 420px; background: #1a1a1a; border-radius: 24px; overflow: hidden; border: 1px solid #333; }
+        
+        /* New Analytics Styling */
+        .analytics-card { background: #141414; border: 1px solid #333; border-radius: 28px; width: 100%; max-width: 420px; padding: 20px; margin-bottom: 15px; }
+        .chart-container { position: relative; height: 200px; width: 100%; margin-top: 10px; }
+        .news-box { width: 100%; max-width: 420px; background: #1a1a1a; border-radius: 24px; overflow: hidden; border: 1px solid #333; margin-top: 15px; }
         .news-ticker { background: #222; color: var(--gold); padding: 10px; text-align: center; font-size: 11px; font-weight: bold; border-bottom: 1px solid #333; }
     </style>
 </head>
@@ -73,12 +79,26 @@
         </div>
     </div>
 
+    <!-- Analytics Section -->
+    <div class="analytics-card">
+        <div style="font-size: 12px; font-weight: bold; color: var(--gold); text-align: center; margin-bottom: 10px;">TRADING PERFORMANCE ANALYTICS</div>
+        <div class="chart-container">
+            <canvas id="performanceChart"></canvas>
+        </div>
+        <div id="statsRow" style="display: flex; justify-content: space-around; margin-top: 15px; font-size: 12px;">
+            <div style="text-align:center;"><span style="color:var(--green);" id="winCount">0</span><br>WINS</div>
+            <div style="text-align:center;"><span style="color:var(--red);" id="lossCount">0</span><br>LOSSES</div>
+            <div style="text-align:center;"><span style="color:var(--gold);" id="winRate">0%</span><br>WIN RATE</div>
+        </div>
+    </div>
+
     <div class="news-box">
         <div class="news-ticker">⚠️ MONITOR NEWS IMPACT</div>
         <iframe src="https://sslecal2.forexprostools.com?columns=exc_curr,exc_importance,exc_actual,exc_prev&features=datepicker,timezone&countries=5&calType=day&timeZone=55&lang=1&importance=2,3" width="100%" height="300" frameborder="0" allowtransparency="true"></iframe>
     </div>
 
     <script>
+        // Existing Clock Engine
         function updateEngine() {
             const now = new Date(), h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
             document.getElementById('digitalTime').innerText = now.toLocaleTimeString('en-GB');
@@ -103,33 +123,67 @@
         }
         setInterval(updateEngine, 1000); updateEngine();
 
+        // Existing Analyzer
         function analyze() {
             const bal = parseFloat(document.getElementById('balance').value), risk = parseFloat(document.getElementById('riskPerc').value), lev = parseFloat(document.getElementById('lev').value), P = parseFloat(document.getElementById('price').value), SH = parseFloat(document.getElementById('sh').value), SL = parseFloat(document.getElementById('sl').value), trend = document.getElementById('maTrend').value;
             if(isNaN(P)||isNaN(bal)) return;
             const range = SH-SL; let entry, tp, slVal, isSell = trend === "down";
             if(isSell){ entry=SH-(range*0.2); tp=SH-(range*1.618); slVal=entry+(Math.abs(tp-entry)*0.5); }
             else { entry=SL+(range*0.2); tp=SL+(range*1.618); slVal=entry-(Math.abs(tp-entry)*0.5); }
-            
-            // Pengiraan Lot Berdasarkan Risk
             const pipsRisk = Math.abs(entry-slVal)*100;
             const amountAtRisk = bal*(risk/100);
             let lot = (amountAtRisk/(pipsRisk*10)).toFixed(2);
             if(lot < 0.01) lot = 0.01;
-
-            // Pengiraan Margin Required (Formula: Price * Lot * 100,000 / Leverage)
-            const marginReq = (P * lot * 100000 / lev) / 100; // Simplified for Gold/Forex context
-            
+            const marginReq = (P * lot * 100000 / lev) / 100; 
             document.getElementById('resEntry').innerText = (isSell?"SELL @ ":"BUY @ ") + entry.toFixed(2);
             document.getElementById('resSlTp').innerText = "SL: "+slVal.toFixed(2)+" | TP: "+tp.toFixed(2);
             document.getElementById('resLot').innerText = lot;
             document.getElementById('resMargin').innerText = "$"+marginReq.toFixed(2);
-            
             const warn = document.getElementById('mcWarning');
             if(marginReq > bal) { warn.innerText = "❌ INSUFFICIENT MARGIN! REDUCE LOT"; warn.style.color="var(--red)"; }
             else if(amountAtRisk > (bal*0.2)) { warn.innerText = "⚠️ HIGH RISK ALERT!"; warn.style.color="var(--red)"; }
             else { warn.innerText = "✅ PLAN VALIDATED"; warn.style.color="var(--green)"; }
             document.getElementById('resultPanel').style.display = 'block';
         }
+
+        // New Performance Analytics Logic
+        async function loadAnalytics() {
+            try {
+                const response = await fetch('trades.json');
+                const data = await response.json();
+                
+                const wins = data.filter(t => t.result === 'Win').length;
+                const losses = data.filter(t => t.result === 'Loss').length;
+                const wr = ((wins / data.length) * 100).toFixed(1);
+
+                document.getElementById('winCount').innerText = wins;
+                document.getElementById('lossCount').innerText = losses;
+                document.getElementById('winRate').innerText = wr + "%";
+
+                const ctx = document.getElementById('performanceChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Wins', 'Losses'],
+                        datasets: [{
+                            data: [wins, losses],
+                            backgroundColor: ['#00ff88', '#ff4444'],
+                            borderWidth: 0,
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        cutout: '70%',
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            } catch (e) {
+                console.log("Waiting for trades.json data...");
+            }
+        }
+        loadAnalytics();
     </script>
 </body>
 </html>

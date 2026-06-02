@@ -3,48 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XPIKOLLAH ELITE HUB V4 - OVERLAP SIGNAL</title>
+    <title>XPIKOLLAH ELITE HUB V4 - SANDGLASS FIX</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --gold: #f1c40f; --blue: #00d2ff; --red: #ff4444; --green: #00ff88; --bg: #0a0a0a; }
         body { background-color: var(--bg); color: #e0e0e0; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 10px; margin: 0; }
         
-        /* OVERLAP & CLOCK SECTION */
+        /* 1. CLOCK & OVERLAP BULB */
         .master-clock-section { background: rgba(255,255,255,0.03); width: 100%; max-width: 420px; padding: 20px; border-radius: 28px; border: 1px solid #222; margin-bottom: 15px; display: flex; flex-direction: column; align-items: center; position: relative; }
-        .overlap-bulb { position: absolute; top: 15px; right: 20px; font-size: 24px; filter: grayscale(1); transition: 0.3s; }
-        .bulb-active { filter: grayscale(0) drop-shadow(0 0 10px var(--gold)); color: var(--gold); }
-        .overlap-text { font-size: 10px; font-weight: bold; margin-top: 5px; color: #444; }
-        .overlap-alert { color: var(--gold); }
-
+        .overlap-badge { position: absolute; top: 15px; right: 25px; display: flex; flex-direction: column; align-items: center; opacity: 0.1; transition: all 0.5s ease; }
+        .overlap-active { opacity: 1; filter: drop-shadow(0 0 12px var(--gold)); transform: scale(1.1); }
+        .overlap-icon { font-size: 28px; }
+        .overlap-text { font-size: 8px; font-weight: bold; color: var(--gold); margin-top: 2px; }
         .analog-master { width: 80px; height: 80px; border: 3px solid #333; border-radius: 50%; position: relative; background: #111; margin-bottom: 10px; }
         .master-hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom; background: #fff; border-radius: 10px; }
         .m-hour { width: 3px; height: 25px; z-index: 3; } .m-min { width: 2px; height: 35px; z-index: 2; } .m-sec { width: 1px; height: 38px; z-index: 1; background: var(--gold); }
 
-        /* SESSION GRID */
+        /* 2. SESSION SANDGLASS (KOTAK TURUN) */
         .session-grid { display: grid; grid-template-columns: repeat(4, 1fr); width: 100%; max-width: 420px; gap: 10px; margin-bottom: 15px; }
         .glass-item { background: #151515; padding: 15px 5px; border-radius: 15px; border: 1px solid #222; display: flex; flex-direction: column; align-items: center; }
-        .glass-tube { width: 18px; height: 70px; display: flex; flex-direction: column; gap: 3px; margin-bottom: 8px; }
-        .block { flex: 1; background: #222; border-radius: 3px; }
+        .glass-tube { width: 18px; height: 70px; display: flex; flex-direction: column; gap: 3px; margin-bottom: 8px; overflow: hidden; }
+        .block { flex: 1; background: #222; border-radius: 3px; transition: background 0.5s; }
         .lbl-session { font-size: 8px; font-weight: bold; color: #444; text-transform: uppercase; }
+        .active-syd { color: var(--blue) !important; } .active-tky { color: var(--gold) !important; } .active-ldn { color: var(--green) !important; } .active-ny { color: var(--red) !important; }
 
-        /* CARDS */
+        /* 3. CARDS & LAYOUT */
         .app-card, .analytics-card { background: #141414; border: 1px solid #333; border-radius: 28px; width: 100%; max-width: 420px; padding: 25px; box-sizing: border-box; margin-bottom: 15px; }
         input, select, textarea { width: 100%; padding: 12px; background: #000; border: 1px solid #333; border-radius: 12px; color: white; margin-bottom: 10px; font-size: 13px; outline: none; }
         button { width: 100%; padding: 15px; background: var(--gold); color: #000; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; }
-        
+        .data-row { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 1px solid #222; }
         .chart-container { position: relative; height: 180px; width: 100%; margin: 10px 0; }
-        .news-box { width: 100%; max-width: 420px; background: #141414; border-radius: 24px; overflow: hidden; border: 1px solid #333; margin-bottom: 30px;}
+        .news-box { width: 100%; max-width: 420px; background: #1a1a1a; border-radius: 24px; overflow: hidden; border: 1px solid #333; margin-bottom: 40px;}
     </style>
 </head>
 <body>
 
+    <!-- SECTION: CLOCK & OVERLAP -->
     <div class="master-clock-section">
-        <div id="bulb" class="overlap-bulb">💡</div>
+        <div id="overlapBulb" class="overlap-badge"><span class="overlap-icon">💡</span><span id="overlapText" class="overlap-text">NO OVERLAP</span></div>
+        <div style="font-size: 10px; color: #888; margin-bottom: 5px;">MALAYSIA (GMT+8)</div>
         <div class="analog-master"><div class="master-hand m-hour"></div><div class="master-hand m-min"></div><div class="master-hand m-sec"></div></div>
-        <div id="digitalTime" style="font-size: 18px; font-weight: bold;">00:00:00</div>
-        <div id="overlapStatus" class="overlap-text">NO OVERLAP</div>
+        <div id="digitalTime" style="font-size: 18px; font-weight: bold; letter-spacing: 2px;">00:00:00</div>
     </div>
 
+    <!-- SECTION: SANDGLASS SESSIONS -->
     <div class="session-grid">
         <div class="glass-item"><div class="glass-tube" id="tube-syd"><div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div></div><div id="lbl-syd" class="lbl-session">Sydney</div></div>
         <div class="glass-item"><div class="glass-tube" id="tube-tky"><div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div></div><div id="lbl-tky" class="lbl-session">Tokyo</div></div>
@@ -52,33 +54,42 @@
         <div class="glass-item"><div class="glass-tube" id="tube-ny"><div class="block"></div><div class="block"></div><div class="block"></div><div class="block"></div></div><div id="lbl-ny" class="lbl-session">New York</div></div>
     </div>
 
+    <!-- SECTION: CALCULATOR -->
     <div class="app-card">
-        <div style="font-size: 11px; color: var(--gold); font-weight: bold; margin-bottom: 15px; text-align: center;">BRN & FIBO EXECUTION</div>
-        <div style="display:flex; gap:10px;"><input type="number" id="balance" placeholder="Bal ($)"><input type="number" id="riskPerc" value="10"></div>
+        <div style="font-size: 11px; color: var(--gold); font-weight: bold; margin-bottom: 15px; text-align: center;">LEVERAGE & FIBO CALCULATOR</div>
+        <div style="display:flex; gap:10px;"><input type="number" id="balance" placeholder="Bal ($)"><input type="number" id="riskPerc" value="10"><select id="lev"><option value="500">1:500</option><option value="1000">1:1000</option></select></div>
         <input type="number" id="price" placeholder="Current Price">
         <div style="display:flex; gap:10px;"><input type="number" id="sh" placeholder="High"><input type="number" id="sl" placeholder="Low"></div>
-        <select id="maTrend"><option value="up">BULLISH (MA 50 > 200) ↑</option><option value="down">BEARISH (MA 50 < 200) ↓</option></select>
+        <select id="maTrend"><option value="up">BULLISH ↑</option><option value="down">BEARISH ↓</option></select>
         <button onclick="analyze()">EXECUTE TRADE PLAN</button>
-        <div id="resultPanel" style="display:none; margin-top:15px; font-size:12px; background:rgba(255,255,255,0.02); padding:10px; border-radius:12px;">
-            Entry: <span id="resEntry" style="color:var(--gold)"></span> | SL: <span id="resSl"></span> | TP: <span id="resTp" style="color:var(--green)"></span><br>
-            Lot: <span id="resLot" style="color:var(--gold)"></span>
+
+        <div id="resultPanel" style="display:none; margin-top:15px; background:rgba(255,255,255,0.02); padding:15px; border-radius:20px;">
+            <div class="data-row"><span>BIAS / ENTRY</span><span id="resEntry" style="font-weight:bold; color:var(--gold);"></span></div>
+            <div class="data-row"><span>SL / TP</span><span id="resSlTp" style="font-size:11px;"></span></div>
+            <div class="data-row" style="color:var(--gold);"><span>LOT SIZE</span><span id="resLot" style="font-weight:bold;"></span></div>
+            <div class="data-row"><span>MARGIN REQ.</span><span id="resMargin"></span></div>
         </div>
     </div>
 
+    <!-- SECTION: ANALYTICS -->
     <div class="analytics-card">
         <div class="chart-container"><canvas id="performanceChart"></canvas></div>
-        <div style="display:flex; justify-content:space-around; font-size:11px;">
-            <div><span id="winCount">0</span> WINS</div>
-            <div><span id="lossCount">0</span> LOSSES</div>
-            <div><span id="winRate">0%</span> RATE</div>
+        <div style="display:flex; justify-content:space-around; font-size:11px; margin-bottom:15px;">
+            <div><span style="color:var(--green);" id="winCount">0</span> WINS</div>
+            <div><span style="color:var(--red);" id="lossCount">0</span> LOSSES</div>
+            <div><span style="color:var(--gold);" id="winRate">0%</span> RATE</div>
         </div>
-        <div style="margin-top:15px;"><input type="text" id="jPair" placeholder="Pair"><select id="jResult"><option value="Win">WIN</option><option value="Loss">Loss</option></select><button onclick="addToJournal()">SAVE</button></div>
-        <div id="historyList" style="margin-top:10px; max-height:150px; overflow-y:auto;"></div>
-        <button onclick="copyForPowerBI()" style="background:#0078d4; color:white; margin-top:10px; padding:10px; font-size:11px;">COPY FOR POWER BI</button>
+        <div class="input-group"><input type="text" id="jPair" placeholder="Pair"><select id="jResult"><option value="Win">WIN</option><option value="Loss">Loss</option></select></div>
+        <textarea id="jReason" placeholder="Reason..." rows="2"></textarea>
+        <button onclick="addToJournal()" style="padding:10px;">SAVE TRADE</button>
+        <div id="historyList" style="margin-top:15px; max-height:150px; overflow-y:auto;"></div>
+        <button onclick="copyForPowerBI()" style="background:#0078d4; color:white; font-size:11px; margin-top:10px; width:100%;">📋 COPY CSV</button>
     </div>
 
+    <!-- SECTION: NEWS -->
     <div class="news-box">
-        <iframe src="https://sslecal2.forexprostools.com?columns=exc_curr,exc_importance,exc_actual,exc_prev&features=datepicker,timezone&countries=5&calType=day&timeZone=55&lang=1&importance=2,3" width="100%" height="400" frameborder="0"></iframe>
+        <div class="news-ticker">⚠️ MONITOR NEWS IMPACT</div>
+        <iframe src="https://sslecal2.forexprostools.com?columns=exc_curr,exc_importance,exc_actual,exc_prev&features=datepicker,timezone&countries=5&calType=day&timeZone=55&lang=1&importance=2,3" width="100%" height="350" frameborder="0"></iframe>
     </div>
 
     <script>
@@ -90,31 +101,63 @@
             document.querySelector('.m-min').style.transform = `translateX(-50%) rotate(${m*6}deg)`;
             document.querySelector('.m-sec').style.transform = `translateX(-50%) rotate(${s*6}deg)`;
             
-            const sessions = [{id:'syd',s:6,e:14,c:'var(--blue)'},{id:'tky',s:8,e:17,c:'var(--gold)'},{id:'ldn',s:15,e:24,c:'var(--green)'},{id:'ny',s:20,e:30,c:'var(--red)'}];
+            const sessions = [ 
+                { id:'syd', s:6, e:14, c:'var(--blue)', cl:'active-syd' }, 
+                { id:'tky', s:8, e:17, c:'var(--gold)', cl:'active-tky' }, 
+                { id:'ldn', s:15, e:24, c:'var(--green)', cl:'active-ldn' }, 
+                { id:'ny', s:20, e:30, c:'var(--red)', cl:'active-ny' } 
+            ];
+            
             let activeCount = 0;
             sessions.forEach(sess => {
                 let curH = h; if(sess.id==='ny' && h<6) curH=h+24;
                 const active = curH >= sess.s && curH < sess.e;
-                if(active) activeCount++;
                 const blocks = document.getElementById('tube-'+sess.id).getElementsByClassName('block');
-                for(let b of blocks) b.style.background = active ? sess.c : '#222';
+                const lbl = document.getElementById('lbl-'+sess.id);
+                
+                if(active){
+                    activeCount++;
+                    lbl.className='lbl-session '+sess.cl;
+                    // LOGIK JAM PASIR: Kira baki % masa sesi
+                    const totalSec = (sess.e - sess.s) * 3600;
+                    const elapsedSec = ((curH - sess.s) * 3600) + (m * 60) + s;
+                    const remainingPerc = 100 - ((elapsedSec / totalSec) * 100);
+                    
+                    // Isi kotak dari bawah mengikut % baki masa
+                    for(let i=0; i<4; i++){
+                        let blockThreshold = (3 - i) * 25; // 0, 25, 50, 75
+                        if(remainingPerc > blockThreshold + 25) {
+                            blocks[i].style.background = sess.c;
+                        } else if(remainingPerc > blockThreshold) {
+                            let fill = ((remainingPerc - blockThreshold) / 25) * 100;
+                            blocks[i].style.background = `linear-gradient(to top, ${sess.c} ${fill}%, #222 0%)`;
+                        } else {
+                            blocks[i].style.background = '#222';
+                        }
+                    }
+                } else {
+                    lbl.className='lbl-session';
+                    for(let b of blocks) b.style.background='#222';
+                }
             });
 
-            const bulb = document.getElementById('bulb');
-            const status = document.getElementById('overlapStatus');
-            if(activeCount >= 2) { bulb.classList.add('bulb-active'); status.innerText = "OVERLAP ALERT (VOLATILE)"; status.classList.add('overlap-alert'); }
-            else { bulb.classList.remove('bulb-active'); status.innerText = "NO OVERLAP"; status.classList.remove('overlap-alert'); }
+            const bulb = document.getElementById('overlapBulb');
+            if(activeCount > 1) bulb.classList.add('overlap-active');
+            else bulb.classList.remove('overlap-active');
         }
-        setInterval(updateEngine, 1000);
 
         function analyze() {
-            const bal = parseFloat(document.getElementById('balance').value), SH = parseFloat(document.getElementById('sh').value), SL = parseFloat(document.getElementById('sl').value), trend = document.getElementById('maTrend').value;
-            const range = SH - SL;
-            let entry = trend === "up" ? SL + (range * 0.2) : SH - (range * 0.2);
-            let tp = trend === "up" ? SL + (range * 1.618) : SH - (range * 1.618);
-            document.getElementById('resEntry').innerText = entry.toFixed(2);
-            document.getElementById('resTp').innerText = tp.toFixed(2);
-            document.getElementById('resLot').innerText = (bal * 0.1 / 100).toFixed(2); // Mock lot
+            const bal = parseFloat(document.getElementById('balance').value), risk = parseFloat(document.getElementById('riskPerc').value), lev = parseFloat(document.getElementById('lev').value), P = parseFloat(document.getElementById('price').value), SH = parseFloat(document.getElementById('sh').value), SL = parseFloat(document.getElementById('sl').value), trend = document.getElementById('maTrend').value;
+            if(!P || !bal) return;
+            const range = SH-SL; let isSell = trend === "down";
+            let entry = isSell ? SH-(range*0.2) : SL+(range*0.2);
+            let tp = isSell ? SH-(range*1.618) : SL+(range*1.618);
+            let slVal = isSell ? entry+(Math.abs(tp-entry)*0.5) : entry-(Math.abs(tp-entry)*0.5);
+            let lot = (bal*(risk/100)/(Math.abs(entry-slVal)*1000)).toFixed(2);
+            document.getElementById('resEntry').innerText = (isSell?"SELL @ ":"BUY @ ") + entry.toFixed(2);
+            document.getElementById('resSlTp').innerText = `SL: ${slVal.toFixed(2)} | TP: ${tp.toFixed(2)}`;
+            document.getElementById('resLot').innerText = lot;
+            document.getElementById('resMargin').innerText = "$" + (P*lot*1000/lev).toFixed(2);
             document.getElementById('resultPanel').style.display = 'block';
         }
 
@@ -126,18 +169,25 @@
             const ctx = document.getElementById('performanceChart').getContext('2d');
             if(myChart) myChart.destroy();
             myChart = new Chart(ctx, { type:'doughnut', data:{datasets:[{data:[wins,losses], backgroundColor:['#00ff88','#ff4444'], borderWidth:0}]}, options:{cutout:'80%', plugins:{legend:{display:false}}} });
-            document.getElementById('historyList').innerHTML = data.slice().reverse().map(t => `<div style="font-size:10px; margin-bottom:5px;">${t.pair} - ${t.result}</div>`).join('');
+            document.getElementById('historyList').innerHTML = data.slice().reverse().map(t => `<div style="font-size:10px; border-bottom:1px solid #222; padding:5px;">${t.pair} - ${t.result}</div>`).join('');
         }
 
         function addToJournal() {
-            const pair = document.getElementById('jPair').value || 'XAUUSD', result = document.getElementById('jResult').value;
+            const pair = document.getElementById('jPair').value || 'XAUUSD', result = document.getElementById('jResult').value, reason = document.getElementById('jReason').value;
             const data = JSON.parse(localStorage.getItem('myEliteTrades') || '[]');
-            data.push({ pair, result, date: new Date().toLocaleDateString() });
+            data.push({ pair, result, reason, date: new Date().toLocaleDateString() });
             localStorage.setItem('myEliteTrades', JSON.stringify(data));
             loadAnalytics();
         }
 
-        loadAnalytics(); updateEngine();
+        function copyForPowerBI() {
+            const data = JSON.parse(localStorage.getItem('myEliteTrades') || '[]');
+            let csv = "Date,Pair,Result,Reason\n";
+            data.forEach(t => { csv += `${t.date},${t.pair},${t.result},"${t.reason}"\n`; });
+            navigator.clipboard.writeText(csv); alert("CSV Copied!");
+        }
+
+        setInterval(updateEngine, 1000); updateEngine(); loadAnalytics();
     </script>
 </body>
 </html>

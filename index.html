@@ -26,17 +26,18 @@
         .active-syd { color: var(--blue) !important; } .active-tky { color: var(--gold) !important; } .active-ldn { color: var(--green) !important; } .active-ny { color: var(--red) !important; }
         .app-card { background: #141414; border: 1px solid #333; border-radius: 28px; width: 100%; max-width: 420px; padding: 25px; box-sizing: border-box; margin-bottom: 15px; }
         .input-group { display: flex; gap: 10px; margin-bottom: 10px; }
-        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid #333; border-radius: 12px; color: white; margin-bottom: 10px; font-size: 13px; outline: none; }
+        input, select, textarea { width: 100%; padding: 12px; background: #000; border: 1px solid #333; border-radius: 12px; color: white; margin-bottom: 10px; font-size: 13px; outline: none; font-family: inherit; }
         button { width: 100%; padding: 15px; background: var(--gold); color: #000; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; }
         .result-panel { margin-top: 15px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 20px; display: none; }
         .data-row { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 1px solid #222; }
         .risk-warning { color: var(--red); font-size: 11px; text-align: center; margin-top: 10px; font-weight: bold; }
         
-        /* Analytics & Journal Styling */
         .analytics-card { background: #141414; border: 1px solid #333; border-radius: 28px; width: 100%; max-width: 420px; padding: 20px; margin-bottom: 15px; box-sizing: border-box; }
-        .chart-container { position: relative; height: 180px; width: 100%; margin-top: 10px; }
-        .journal-input { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 20px; border: 1px dashed #444; margin-top: 15px; }
-        .btn-small { padding: 8px; font-size: 11px; background: #333; color: var(--gold); margin-top: 5px; border-radius: 8px; }
+        .chart-container { position: relative; height: 160px; width: 100%; margin-top: 10px; }
+        .journal-form { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 20px; border: 1px dashed #444; margin-top: 15px; }
+        .journal-list { margin-top: 15px; width: 100%; max-height: 200px; overflow-y: auto; }
+        .history-item { font-size: 10px; background: #111; padding: 10px; border-radius: 10px; border-left: 3px solid var(--gold); margin-bottom: 8px; }
+        .btn-copy { background: #0078d4; color: white; font-size: 11px; padding: 10px; border-radius: 8px; margin-top: 10px; width: 100%; border: none; font-weight: bold; }
         .news-box { width: 100%; max-width: 420px; background: #1a1a1a; border-radius: 24px; overflow: hidden; border: 1px solid #333; margin-top: 15px; }
         .news-ticker { background: #222; color: var(--gold); padding: 10px; text-align: center; font-size: 11px; font-weight: bold; border-bottom: 1px solid #333; }
     </style>
@@ -63,7 +64,7 @@
             <input type="number" id="riskPerc" placeholder="Risk %" value="10">
             <select id="lev"><option value="500">1:500</option><option value="1000">1:1000</option><option value="2000">1:2000</option><option value="30">1:30</option></select>
         </div>
-        <input type="number" id="price" placeholder="Current Price (e.g. 2350.00)">
+        <input type="number" id="price" placeholder="Current Price">
         <div class="input-group">
             <input type="number" id="sh" placeholder="High"><input type="number" id="sl" placeholder="Low">
         </div>
@@ -81,7 +82,7 @@
     </div>
 
     <div class="analytics-card">
-        <div style="font-size: 12px; font-weight: bold; color: var(--gold); text-align: center; margin-bottom: 10px;">TRADING PERFORMANCE ANALYTICS</div>
+        <div style="font-size: 12px; font-weight: bold; color: var(--gold); text-align: center; margin-bottom: 10px;">ELITE TRADING JOURNAL</div>
         <div class="chart-container"><canvas id="performanceChart"></canvas></div>
         <div id="statsRow" style="display: flex; justify-content: space-around; margin-top: 15px; font-size: 11px;">
             <div style="text-align:center;"><span style="color:var(--green);" id="winCount">0</span><br>WINS</div>
@@ -89,15 +90,32 @@
             <div style="text-align:center;"><span style="color:var(--gold);" id="winRate">0%</span><br>WR</div>
         </div>
 
-        <div class="journal-input">
-            <div style="font-size: 10px; color: #888; margin-bottom: 8px; text-align: center;">QUICK ADD TO JOURNAL</div>
+        <div class="journal-form">
+            <div style="font-size: 10px; color: var(--gold); text-align: center; margin-bottom: 10px; font-weight:bold;">ADD TRADE RECORD</div>
             <div class="input-group">
-                <input type="text" id="jPair" placeholder="Pair" style="font-size: 11px; padding: 8px;">
-                <select id="jResult" style="font-size: 11px; padding: 8px;"><option value="Win">WIN</option><option value="Loss">LOSS</option></select>
+                <input type="text" id="jPair" placeholder="XAUUSD">
+                <select id="jType"><option value="Buy">BUY</option><option value="Sell">SELL</option></select>
             </div>
-            <button onclick="addToJournal()" style="padding: 10px; font-size: 12px;">ADD TO JOURNAL</button>
-            <button onclick="clearJournal()" class="btn-small" style="width:100%; background:transparent; border:1px solid #333;">RESET LOCAL DATA</button>
+            <div class="input-group">
+                <input type="number" id="jEntry" placeholder="Entry Price">
+                <input type="number" id="jRisk" placeholder="Risk %" value="1">
+            </div>
+            <div class="input-group">
+                <input type="number" id="jSl" placeholder="SL">
+                <input type="number" id="jTp" placeholder="TP">
+            </div>
+            <textarea id="jReason" placeholder="Reason (e.g. Reject SnR H4)" rows="2"></textarea>
+            <select id="jResult">
+                <option value="Win">✅ HIT TAKE PROFIT (WIN)</option>
+                <option value="Loss">❌ HIT STOP LOSS (LOSS)</option>
+            </select>
+            <button onclick="addToJournal()" style="padding: 10px; font-size: 12px; margin-top: 5px;">SAVE TO JOURNAL</button>
         </div>
+        
+        <div id="historyList" class="journal-list"></div>
+        
+        <button onclick="copyForPowerBI()" class="btn-copy">📋 COPY ALL DATA FOR POWER BI</button>
+        <button onclick="clearJournal()" style="background:transparent; border:1px solid #333; color:#666; font-size:10px; padding:5px; margin-top:10px; width:100%;">RESET ALL HISTORY</button>
     </div>
 
     <div class="news-box">
@@ -107,7 +125,6 @@
 
     <script>
         let myChart;
-
         function updateEngine() {
             const now = new Date(), h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
             document.getElementById('digitalTime').innerText = now.toLocaleTimeString('en-GB');
@@ -156,12 +173,8 @@
 
         async function loadAnalytics() {
             let githubData = [];
-            try {
-                const response = await fetch('trades.json');
-                githubData = await response.json();
-            } catch (e) { console.log("JSON not found, using local only."); }
-
-            const localData = JSON.parse(localStorage.getItem('myTrades') || '[]');
+            try { const res = await fetch('trades.json'); githubData = await res.json(); } catch(e){}
+            const localData = JSON.parse(localStorage.getItem('myEliteTrades') || '[]');
             const allData = [...githubData, ...localData];
             
             const wins = allData.filter(t => t.result === 'Win').length;
@@ -176,35 +189,64 @@
             if(myChart) myChart.destroy();
             myChart = new Chart(ctx, {
                 type: 'doughnut',
-                data: {
-                    labels: ['Wins', 'Losses'],
-                    datasets: [{
-                        data: [wins, losses],
-                        backgroundColor: ['#00ff88', '#ff4444'],
-                        borderWidth: 0
-                    }]
-                },
-                options: { cutout: '75%', plugins: { legend: { display: false } } }
+                data: { labels: ['Wins', 'Losses'], datasets: [{ data:[wins, losses], backgroundColor:['#00ff88','#ff4444'], borderWidth:0 }] },
+                options: { cutout:'75%', plugins:{ legend:{display:false} } }
             });
+
+            const hist = document.getElementById('historyList');
+            hist.innerHTML = localData.slice().reverse().map(t => `
+                <div class="history-item">
+                    <b>${t.type} ${t.pair}</b> | RR: ${t.rr} | Result: ${t.result}<br>
+                    <span style="color:#888">E: ${t.entry} | SL: ${t.sl} | TP: ${t.tp}</span><br>
+                    <span style="color:var(--gold)">Reason: ${t.reason}</span>
+                </div>
+            `).join('');
         }
 
         function addToJournal() {
             const pair = document.getElementById('jPair').value || 'NA';
+            const type = document.getElementById('jType').value;
+            const entry = parseFloat(document.getElementById('jEntry').value) || 0;
+            const sl = parseFloat(document.getElementById('jSl').value) || 0;
+            const tp = parseFloat(document.getElementById('jTp').value) || 0;
+            const risk = document.getElementById('jRisk').value;
+            const reason = document.getElementById('jReason').value || 'No reason';
             const result = document.getElementById('jResult').value;
-            const localData = JSON.parse(localStorage.getItem('myTrades') || '[]');
-            localData.push({ pair, result, date: new Date().toISOString() });
-            localStorage.setItem('myTrades', JSON.stringify(localData));
+
+            const riskAmt = Math.abs(entry - sl);
+            const rewardAmt = Math.abs(tp - entry);
+            const rr = riskAmt > 0 ? (rewardAmt / riskAmt).toFixed(1) : 0;
+
+            const localData = JSON.parse(localStorage.getItem('myEliteTrades') || '[]');
+            localData.push({ 
+                date: new Date().toLocaleDateString(), 
+                pair, type, entry, sl, tp, risk, reason, result, rr: `1:${rr}` 
+            });
+            localStorage.setItem('myEliteTrades', JSON.stringify(localData));
             loadAnalytics();
-            alert("Trade Saved Local!");
+            alert("Journal Updated!");
+        }
+
+        function copyForPowerBI() {
+            const localData = JSON.parse(localStorage.getItem('myEliteTrades') || '[]');
+            if(localData.length === 0) { alert("No data to copy!"); return; }
+            
+            // Header CSV
+            let csv = "Date,Pair,Type,Entry,SL,TP,RiskPerc,Result,RR,Reason\n";
+            
+            // Data Rows
+            localData.forEach(t => {
+                csv += `${t.date},${t.pair},${t.type},${t.entry},${t.sl},${t.tp},${t.risk},${t.result},${t.rr},"${t.reason}"\n`;
+            });
+
+            navigator.clipboard.writeText(csv).then(() => {
+                alert("Data copied in CSV format! You can now paste it into Excel or Power BI.");
+            });
         }
 
         function clearJournal() {
-            if(confirm("Clear local trades?")) {
-                localStorage.removeItem('myTrades');
-                loadAnalytics();
-            }
+            if(confirm("Reset all history?")) { localStorage.removeItem('myEliteTrades'); loadAnalytics(); }
         }
-        
         loadAnalytics();
     </script>
 </body>

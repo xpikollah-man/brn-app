@@ -1,0 +1,14 @@
+[
+  {
+    "date": "2026-06-01",
+    "pair": "GOLD",
+    "result": "Win",
+    "profit": 100
+  },
+  {
+    "date": "2026-06-02",
+    "pair": "GBPUSD",
+    "result": "Loss",
+    "profit": -50
+  }
+]
